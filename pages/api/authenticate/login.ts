@@ -12,9 +12,11 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
     } else {
         const erro: IResponseError = {
-            name: 'NOT_FOUND',
-            message: 'Not found'
+            name: 'NOT_ALLOWED',
+            message: 'Method not allowed'
         }
+
+        res.status(405).json(erro);
     }
 };
 export default handler;

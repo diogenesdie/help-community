@@ -1,4 +1,4 @@
-export type TErrorType = 'ERROR' | 'NOT_FOUND' | 'UNAUTHORIZED' | 'FORBIDDEN' | 'VALIDATION_ERROR' | 'INTERNAL_SERVER_ERROR';
+export type TErrorType = 'ERROR' | 'NOT_FOUND'  | 'NOT_ALLOWED' | 'UNAUTHORIZED' | 'FORBIDDEN' | 'VALIDATION_ERROR' | 'INTERNAL_SERVER_ERROR';
 
 export interface IErrorField {
     field: string;
