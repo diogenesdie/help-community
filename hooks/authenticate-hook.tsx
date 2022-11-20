@@ -1,0 +1,151 @@
+import { ISession, IAuthenticateProviderProps, IDialogProps } from "@/types/authenticate";
+import { IResponseError } from "@/types/response";
+import React, { useContext, createContext, useState } from "react";
+import useSWR, { useSWRConfig } from "swr";
+import { Dialog } from "primereact/dialog";
+import { Button } from "primereact/button";
+import { classNames } from "primereact/utils";
+import { loadSession } from "@/services/authenticate-service";
+import { clearLocals } from "@/utils/local-utils";
+import { isEmpty } from "@/utils/string-utils";
+
+/**
+ * Authenticate provider
+ */
+export const AuthContext = createContext<IAuthenticateProviderProps>({
+    session: null,
+    is_loading: false,
+    error: null,
+    is_logged_in: false,
+    reload: () => {},
+    showDialog: () => {}
+});
+
+/**
+ * Hook thats gets the session
+ */
+export const useAutenticacao = () => useContext(AuthContext);
+
+/**
+ * Hook thats generates the parent component to 
+ */
+export const useProviderAuthenticate = () => {
+    const keyProvideAuthenticate = '/api/authenticate/login';
+    const swrConfig = useSWRConfig();
+
+    const { data, error, mutate, isValidating } = useSWR<ISession | undefined, IResponseError>(keyProvideAuthenticate, async () => await loadSession(), {
+        onErrorRetry(err, _key, _config, revalidate, { retryCount }) {
+            if( ['UNAUTHORIZED','SESSION_EXPIRED', 'SESSION_CLOSED'].indexOf(err.name) !== -1 ) {
+                clearLocals();
+                mutate(undefined);
+                return;    
+            }
+
+            //Try only 10 times
+            if( retryCount > 10 ) return;
+
+            //Retry after 5 secondsq
+            setTimeout(() => revalidate({ retryCount }), 5000);
+        },
+    });
+
+    return {
+        sessao: data,
+        is_loading: (!error && !data) || isValidating,
+        error: error,
+        reload: async (): Promise<void> => swrConfig.mutate(keyProvideAuthenticate),
+    }
+};
+
+/**
+ * Provider 
+ */
+const ProvideAutenticacao = (props: any): JSX.Element => {
+    const { 
+        sessao, 
+        is_loading,
+        error,
+        reload
+    } = useProviderAuthenticate();
+    const [modal, setModal] = useState<IDialogProps>({
+        title: 'Atenção',
+        message: '',
+        type: 'info',
+        button_text: 'OK'
+    });
+
+    let isUserAuthenticated = false;
+
+    if( 
+        (
+            !is_loading && 
+            sessao &&
+            !error
+        ) ||
+        (
+            !is_loading && 
+            error &&
+            ['UNAUTHORIZED','SESSION_EXPIRED','SESSION_CLOSED'].indexOf(error.name) === -1 &&
+            error.name !== 'NOT_AUTHENTICATED'
+        ) 
+    ) {
+        isUserAuthenticated = true;
+    }
+
+    return (
+        <AuthContext.Provider 
+            value={
+                {
+                    session: sessao || null,
+                    is_loading: is_loading,
+                    is_logged_in: isUserAuthenticated,
+                    error: error || null,
+                    reload: () => reload(),
+                    showDialog: (props: IDialogProps) => setModal(props)
+                }
+            }
+        >
+            <Dialog 
+                onHide={() => setModal({ 
+                    ...modal,
+                    message: '' 
+                })}
+                modal
+                draggable
+                header={modal.title}
+                visible={!isEmpty(modal.message)}
+                style={{
+                    maxWidth: '520px',
+                }}
+                footer={
+                    <div className="flex justify-content-end">
+                        <Button 
+                            label={modal.button_text || 'OK'}
+                            icon={modal.icon}
+                            className={classNames({
+                                'p-button-danger': modal.type === 'error',
+                                'p-button-warning': modal.type === 'warning',
+                                'p-button-success': modal.type === 'success',
+                                'p-button-primary': modal.type === 'info',
+                            })}
+                            onClick={() => {
+                                setModal({ 
+                                    ...modal, 
+                                    message: '' 
+                                });
+
+                                if( typeof modal.callback === 'function' ) {
+                                    modal.callback();
+                                }
+                            }}
+                        />
+                    </div>
+                }
+            >
+                <p className="m-0 p-2">{modal.message}</p>
+            </Dialog>
+            {props.children}
+        </AuthContext.Provider>
+    )
+};
+export default ProvideAutenticacao;

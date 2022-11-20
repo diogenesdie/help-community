@@ -24,6 +24,7 @@
       "@/styles/*": ["styles/*"],
       "@/utils/*": ["utils/*"],
       "@/hooks/*": ["hooks/*"],
+      "@/services/*": ["services/*"],
       "@/types/*": ["types/*"],
       "@/public/*": ["public/*"]
     }
