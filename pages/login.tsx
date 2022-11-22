@@ -43,7 +43,7 @@ const LoginPage = (): JSX.Element => {
     };
 
     return (
-        <div className="flex h-screen">
+        <div className="flex h-screen overflow-hidden">
             <div className="flex w-6 bg-primary">
                 <div className="flex flex-column align-items-center justify-content-center w-full relative">
                     <Image src={logo} alt="Help Community Logo" width={400}/>

@@ -30,3 +30,7 @@ export interface IDialogProps {
     button_text?: string | null;
     callback?: Function | null;
 }
+export interface ILoginPaylod {
+    username: string;
+    password: string;
+}
