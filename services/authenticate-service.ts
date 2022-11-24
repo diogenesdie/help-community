@@ -1,15 +1,44 @@
+import { IResponseError } from "@/types/response";
 import { ISession, ILoginPaylod } from "@/types/authenticate";
 import client from "@/config/http";
-import { setLocals } from "@/utils/local-utils";
+import { setLocals, getLocals, clearLocals } from "@/utils/local-utils";
+import { isEmpty } from "@/utils/string-utils";
+import { isClientError } from "@/config/http";
 
 export const loadSession = async (): Promise<ISession> => {
-    return {} as ISession;
+    const locals: ISession = getLocals();
+
+    if( !locals || isEmpty(locals.public_token) ) {
+        throw {
+            name: 'NOT_AUTHENTICATED',
+            message: 'User not authenticated'
+        } as IResponseError;
+    }
+
+    let sessionData = await client.get(`/api/authenticate/${locals.public_token}`);
+
+    if (sessionData.status === 200) {
+        return sessionData.data as ISession;
+
+    } else if( isClientError(sessionData) ) {
+        throw {
+            name: 'ERROR',
+            message: sessionData.message || 'Error on load session'
+        } as IResponseError;
+
+    }
+    let erro = sessionData.data as IResponseError;
+
+    if( ['NOT_ALLOWED','SESSION_EXPIRED', 'SESSION_CLOSED'].indexOf(erro.name) !== -1 ) {
+        clearLocals();
+    }
+    throw erro;
 };
 
 export const login = async(data: ILoginPaylod): Promise<ISession> => {
     const response = await client({
         method: 'POST',
-        url: '/authenticate/login',
+        url: '/api/authenticate/login',
         data: data
     });
 

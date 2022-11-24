@@ -2,23 +2,21 @@ import { IResponseError } from "./response";
 export interface IUser {
     id: number;
     username: string;
-    email: string;
+    email?: string;
     admin: boolean;
 }
 export interface ISession {
-    user: IUser;
-    is_loading: boolean;
-    reload: Function;
-    error: IResponseError | null;
+    user: IUser | null; 
     public_token: string;
     private_token: string;
     expires_at: Date;
+    id: number;
 }
 export interface IAuthenticateProviderProps {
     session: ISession | null;
-    is_loading: boolean;
+    isLoadingSession: boolean;
     is_logged_in: boolean;
-    error: IResponseError | null;
+    sessionError: IResponseError | null;
     showDialog: Function;
     reload: Function;
 }

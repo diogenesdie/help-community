@@ -14,8 +14,8 @@ import { isEmpty } from "@/utils/string-utils";
  */
 export const AuthContext = createContext<IAuthenticateProviderProps>({
     session: null,
-    is_loading: false,
-    error: null,
+    isLoadingSession: false,
+    sessionError: null,
     is_logged_in: false,
     reload: () => {},
     showDialog: () => {}
@@ -24,7 +24,7 @@ export const AuthContext = createContext<IAuthenticateProviderProps>({
 /**
  * Hook thats gets the session
  */
-export const useAutenticacao = () => useContext(AuthContext);
+export const useAuthenticate = () => useContext(AuthContext);
 
 /**
  * Hook thats generates the parent component to 
@@ -50,9 +50,9 @@ export const useProviderAuthenticate = () => {
     });
 
     return {
-        sessao: data,
-        is_loading: (!error && !data) || isValidating,
-        error: error,
+        session: data,
+        isLoadingSession: (!error && !data) || isValidating,
+        sessionError: error,
         reload: async (): Promise<void> => swrConfig.mutate(keyProvideAuthenticate),
     }
 };
@@ -60,11 +60,11 @@ export const useProviderAuthenticate = () => {
 /**
  * Provider 
  */
-const ProvideAutenticacao = (props: any): JSX.Element => {
+const ProvideAuthenticate = (props: any): JSX.Element => {
     const { 
-        sessao, 
-        is_loading,
-        error,
+        session, 
+        isLoadingSession,
+        sessionError,
         reload
     } = useProviderAuthenticate();
     const [modal, setModal] = useState<IDialogProps>({
@@ -78,15 +78,15 @@ const ProvideAutenticacao = (props: any): JSX.Element => {
 
     if( 
         (
-            !is_loading && 
-            sessao &&
-            !error
+            !isLoadingSession && 
+            session &&
+            !sessionError
         ) ||
         (
-            !is_loading && 
-            error &&
-            ['UNAUTHORIZED','SESSION_EXPIRED','SESSION_CLOSED'].indexOf(error.name) === -1 &&
-            error.name !== 'NOT_AUTHENTICATED'
+            !isLoadingSession && 
+            sessionError &&
+            ['UNAUTHORIZED','SESSION_EXPIRED','SESSION_CLOSED'].indexOf(sessionError.name) === -1 &&
+            sessionError.name !== 'NOT_AUTHENTICATED'
         ) 
     ) {
         isUserAuthenticated = true;
@@ -96,10 +96,10 @@ const ProvideAutenticacao = (props: any): JSX.Element => {
         <AuthContext.Provider 
             value={
                 {
-                    session: sessao || null,
-                    is_loading: is_loading,
+                    session: session || null,
+                    isLoadingSession: isLoadingSession,
                     is_logged_in: isUserAuthenticated,
-                    error: error || null,
+                    sessionError: sessionError || null,
                     reload: () => reload(),
                     showDialog: (props: IDialogProps) => setModal(props)
                 }
@@ -148,4 +148,4 @@ const ProvideAutenticacao = (props: any): JSX.Element => {
         </AuthContext.Provider>
     )
 };
-export default ProvideAutenticacao;
+export default ProvideAuthenticate;

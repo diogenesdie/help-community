@@ -9,11 +9,11 @@ let prisma = global.prisma || new PrismaClient({
     log: process.env.NODE_ENV === 'development' ? ['info', 'warn', 'error'] : [],
 })
 
-export const getSequence = async (sequenceName: string): Promise<BigInt> => {
-    const result: Array<{ id: bigint }> = await prisma.$queryRaw(
-        Prisma.sql`SELECT nextval(${sequenceName}) as id_tabela`
+export const getSequence = async (sequenceName: string): Promise<number> => {
+    const result: Array<{ id: number }> = await prisma.$queryRaw(
+        Prisma.sql`SELECT nextval(${sequenceName}) as id`
     )
-    return BigInt(result[0].id)
+    return Number(result[0].id);
 }
 
 if( process.env.NODE_ENV === 'development' ) {

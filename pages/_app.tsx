@@ -9,6 +9,7 @@ import Head from 'next/head';
 import { useRef } from 'react';
 import { version } from "../package.json";
 import { SWRConfig } from 'swr';
+import ProvideAuthenticate from '@/hooks/authenticate-hook'
 
 const swrConfig = {
 	revalidateOnFocus: false
@@ -19,11 +20,13 @@ const HelpCommunityApp = ({ Component, pageProps }: AppProps) => {
 	
 	return (
 		<SWRConfig value={swrConfig}>
+			<ProvideAuthenticate>
 			<Head>
 				<meta name="viewport" content="width=device-width, initial-scale=1" />
 				<title>Help Community</title>
 			</Head>
 			<Component {...pageProps} />
+			</ProvideAuthenticate>
 		</SWRConfig>
 	);
 }

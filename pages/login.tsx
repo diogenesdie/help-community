@@ -1,11 +1,15 @@
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/router';
 import Image from 'next/image';
 import logoPrimary from '@/public/images/logo-help-community-primary.png';
 import logo from '@/public/images/logo-help-community.png';
 import { InputText } from 'primereact/inputtext';
 import { Button } from 'primereact/button';
 import { Password } from 'primereact/password';
-import { useState } from 'react';
 import { classNames } from "primereact/utils";
+import { login } from '@/services/authenticate-service';
+import { useAuthenticate } from '@/hooks/authenticate-hook';
+import { ProgressBar } from 'primereact/progressbar';
 
 interface ILoginState {
     username: string;
@@ -28,6 +32,19 @@ const LoginPage = (): JSX.Element => {
         password: ''
     });
     const [errors, setErrors] = useState<ILoginErrors>(templateErrors);
+    const { session, sessionError, isLoadingSession } = useAuthenticate();
+    const router = useRouter();
+
+    useEffect(() => {
+        if( !session || sessionError ) {
+            //Do nothing, not logged in
+            return;
+        }
+
+        // Logged in, redirect to home
+        router.push('/');
+
+    }, [session, router, sessionError]);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
@@ -42,8 +59,54 @@ const LoginPage = (): JSX.Element => {
         }));
     };
 
+    const onSubmit = async (e: any) => {
+        e.preventDefault();
+        const { username, password } = state;
+        console.log(state)
+        if( !username ) {
+            setErrors(prevErrors => ({
+                ...prevErrors,
+                username: 'Username is required'
+            }));
+        }
+
+        if( !password ) {
+            setErrors(prevErrors => ({
+                ...prevErrors,
+                password: 'Password is required'
+            }));
+        }
+
+        try {
+            if( username && password ) {
+                await login({
+                    username,
+                    password
+                });
+            }
+        } catch (error) {
+            console.log(error);
+        }
+
+    }
+
+    if( (session && !sessionError) || isLoadingSession ) {
+        return <div className="flex flex-wrap justify-content-center align-items-center" style={{ height: '100vh' }}>
+                <div className="flex flex-wrap justify-content-center w-full">
+                    <Image src={logoPrimary} alt="Help Community" width={400} />
+                    <div className="w-full flex justify-content-center">
+                        <ProgressBar mode="indeterminate" style={{ height: '6px', width: '200px' }}></ProgressBar>
+                    </div>
+                </div>
+        </div>
+    }
+
     return (
+        
         <div className="flex h-screen overflow-hidden">
+            {session && (
+                <span>Logado</span>
+            )}
             <div className="flex w-6 bg-primary">
                 <div className="flex flex-column align-items-center justify-content-center w-full relative">
                     <Image src={logo} alt="Help Community Logo" width={400}/>
@@ -68,6 +131,7 @@ const LoginPage = (): JSX.Element => {
                         <label htmlFor="username">Username</label>
                         <InputText 
                             id="username"
+                            name="username"
                             type="text"
                             className={classNames({ 
                                 'p-invalid': Boolean(errors.username),
@@ -77,6 +141,7 @@ const LoginPage = (): JSX.Element => {
                             onChange={handleChange} 
                             maxLength={100}
                         />
+                        {errors.username && <small className="p-error">{errors.username}</small>}
                     </div>
                     <div className="p-field w-full">
                         <label htmlFor="password">Password</label>
@@ -93,9 +158,14 @@ const LoginPage = (): JSX.Element => {
                             onChange={handleChange} 
                             maxLength={100}
                         />
+                        {errors.password && <small className="p-error">{errors.password}</small>}
                     </div>
                     <div className="p-field w-full">
-                        <Button label="Login" className="p-button-raised w-full"/>
+                        <Button 
+                            label="Login"
+                            className="p-button-raised w-full"
+                            onClick={onSubmit}
+                        />
                     </div>
                 </div>
             </div>

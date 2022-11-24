@@ -8,7 +8,7 @@ datasource db {
 }
 
 model user {
-  user_id         BigInt            @id(map: "user_pk")
+  user_id         Int               @id(map: "user_pk")
   username        String            @unique(map: "username_un") @db.VarChar(100)
   password        String            @db.VarChar(200)
   admin           String            @default("0") @db.Char
@@ -17,30 +17,105 @@ model user {
   updated_at      DateTime?         @default(now()) @db.Timestamp(6)
   report          report[]
   report_feedback report_feedback[]
+  session         session[]
 
   @@index([username, password])
 }
 
 model report {
-  report_id       BigInt            @id(map: "reports_pk")
+  report_id       Int               @id(map: "reports_pk")
   title           String            @db.VarChar(100)
   body            String
   ups             Int               @default(0)
   downs           Int               @default(0)
-  user_id         BigInt?
+  user_id         Int?
   created_at      DateTime          @default(now()) @db.Timestamp(6)
   updated_at      DateTime          @default(now()) @db.Timestamp(6)
   status          String            @default("PENDING") @db.VarChar(20)
   user            user?             @relation(fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "reports_users_fk")
   report_feedback report_feedback[]
+  report_media    report_media[]
 }
 
 model report_feedback {
-  report_feedback_id BigInt   @id(map: "report_feedback_pk")
+  report_feedback_id Int      @id(map: "report_feedback_pk")
   type               String   @db.VarChar(4)
-  report_id          BigInt
+  report_id          Int
   created_at         DateTime @default(now()) @db.Timestamp(6)
-  user_id            BigInt
+  user_id            Int
   report             report   @relation(fields: [report_id], references: [report_id], onDelete: NoAction, onUpdate: NoAction, map: "report_feedback_reportfk")
   user               user     @relation(fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "report_feedback_user_fk")
+}
+
+model city {
+  city_id      Int      @id(map: "city_pk")
+  name         String   @db.VarChar(200)
+  status       String   @default("A") @db.Char
+  indexed_name String   @db.VarChar(200)
+  state_id     Int
+  created_at   DateTime @default(now()) @db.Timestamp(6)
+  updated_at   DateTime @default(now()) @db.Timestamp(6)
+  state        state    @relation(fields: [state_id], references: [state_id], onDelete: NoAction, onUpdate: NoAction, map: "city_fk")
+
+  @@unique([indexed_name, state_id], map: "city_indexed_name_un")
+  @@unique([name, state_id], map: "city_name_un")
+  @@index([indexed_name])
+  @@index([indexed_name, state_id], map: "city_indexed_name_state_idx")
+}
+
+model country {
+  country_id Int      @id(map: "country_pk")
+  name       String   @unique(map: "country_name_un") @db.VarChar(200)
+  status     String   @default("A") @db.Char
+  acronym    String   @unique(map: "country_acronym_un") @db.VarChar(3)
+  currency   String   @db.VarChar(3)
+  created_at DateTime @default(now()) @db.Timestamp(6)
+  updated_at DateTime @default(now()) @db.Timestamp(6)
+  state      state[]
+}
+
+model report_media {
+  report_media_id Int      @id(map: "report_media_pk")
+  report_id       Int
+  base64          String?
+  link            String?  @db.VarChar(300)
+  created_at      DateTime @default(now()) @db.Timestamp(6)
+  updated_at      DateTime @default(now()) @db.Timestamp(6)
+  report          report   @relation(fields: [report_id], references: [report_id], onDelete: NoAction, onUpdate: NoAction, map: "report_media_fk")
+}
+
+model session {
+  session_id    Int      @id(map: "session_pk")
+  user_id       Int?
+  ip            String?  @db.VarChar(100)
+  private_token String   @db.VarChar(100)
+  public_token  String   @db.VarChar(100)
+  status        String   @default("A") @db.Char
+  device        String?  @db.VarChar(100)
+  expires_at    DateTime @db.Timestamp(6)
+  created_at    DateTime @default(now()) @db.Timestamp(6)
+  updated_at    DateTime @default(now()) @db.Timestamp(6)
+  user          user?    @relation(fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "session_fk")
+
+  @@index([device])
+  @@index([private_token])
+  @@index([public_token])
+}
+
+model state {
+  state_id     Int      @id(map: "state_pk")
+  name         String   @db.VarChar(200)
+  status       String   @default("A") @db.Char
+  acronym      String   @db.VarChar(2)
+  indexed_name String   @db.VarChar(200)
+  country_id   Int
+  created_at   DateTime @default(now()) @db.Timestamp(6)
+  updated_at   DateTime @default(now()) @db.Timestamp(6)
+  country      country  @relation(fields: [country_id], references: [country_id], onDelete: NoAction, onUpdate: NoAction, map: "state_fk")
+  city         city[]
+
+  @@unique([indexed_name, country_id], map: "state_indexed_name_un")
+  @@unique([name, country_id], map: "state_name_un")
+  @@index([indexed_name, country_id], map: "state_indexed_name_country_idx")
+  @@index([indexed_name])
 }
