@@ -175,7 +175,11 @@ export const getLoginSession = async (req: NextApiRequest | ReqServerSideProps, 
     }
 
     return {
-        user: user,
+        user: {
+            id: user?.user_id,
+            username: user?.username,
+            admin: user?.admin === '1'
+        },
         expires_at: session.expires_at,
         private_token: session.private_token,
         public_token: session.public_token,

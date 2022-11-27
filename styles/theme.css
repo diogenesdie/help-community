@@ -1,0 +1,42 @@
+
+.p-panelmenu .p-panelmenu-header > a {
+    padding: .75rem;
+    border: none;
+    background-color: transparent;
+    margin-top: 1rem;
+    font-weight: 600;
+}
+.p-panelmenu .p-panelmenu-header > a:focus {
+    box-shadow: none;
+}
+.p-panelmenu .p-panelmenu-header:not(.p-highlight):not(.p-disabled) > a:hover {
+    background-color: transparent;
+}
+.p-panelmenu .p-panelmenu-header.p-highlight > a {
+    background-color: transparent;
+}
+.p-panelmenu .p-panelmenu-header.p-highlight:not(.p-disabled) > a:hover{
+    background-color: transparent;
+}
+.p-panelmenu .p-panelmenu-content {
+    border: none;
+}
+.p-panelmenu .p-panelmenu-content .p-menuitem .p-menuitem-link {
+    padding: .75rem;
+    font-weight: 600;
+}
+.p-panelmenu .p-panelmenu-content .p-menuitem .p-menuitem-link .p-menuitem-icon {
+    margin-right: 1.5rem;
+}
+.no-panel .p-tabview-panels {
+    display: none;
+}
+.ql-editor.ql-blank::before {
+    color: #eee;
+}
+.p-editor-content.ql-container.ql-snow{
+    border: none;
+}
+.ql-editor {
+    font-size: large;
+}

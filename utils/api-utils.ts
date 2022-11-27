@@ -37,6 +37,10 @@ import { isEmpty } from '@/utils/string-utils'
             error.status = 500;
         }
 
+        if( process.env.NODE_ENV === 'development' ) {
+            error.message = `${error.message} - ${err?.stack}`;
+        }
+
         return error;
     }
 }
@@ -58,3 +62,32 @@ import { isEmpty } from '@/utils/string-utils'
         error: erro
     }
 }
+
+/**
+ * Build a query string based on object
+ * 
+ * @param object Object to build query string
+ * @returns Query string built
+ */
+ export const toQueryString = (object: any): string => {
+    if( !object || typeof object !== 'object' ) {
+        return '';
+    }
+    let keys = Object.keys(object);
+
+    return keys.map(key => {
+        let value = object[key];
+
+        if( !value ) {
+            value = '';
+        }
+
+        if( Array.isArray(value) ) {
+            value = value.join(',');
+
+        } else if( typeof value === 'object' ) {
+            value = JSON.stringify(value);
+        }
+        return `${encodeURIComponent(key)}=${encodeURIComponent(value)}`;
+    }).join('&');
+};
