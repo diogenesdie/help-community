@@ -1,6 +1,6 @@
 import axios from "axios";
 
-let baseURL = "http://localhost:3000";
+let baseURL = typeof document === 'object' ? document.location.origin : "http://localhost:3000";
 let timeout = 10000;
 
 // Get URL from environment variable
