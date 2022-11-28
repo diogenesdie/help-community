@@ -5,6 +5,7 @@ import { IFiltersReports } from "@/data/report/source";
 import { isEmpty } from "@/utils/string-utils";
 import { ProgressBar } from 'primereact/progressbar';
 import { forwardRef, useImperativeHandle } from "react";
+import Report from "@/components/shared/Report";
 
 export interface IReportsListRef {
     reload: () => void;
@@ -17,7 +18,7 @@ const ReportsList = forwardRef(function ReportsList(props, ref): JSX.Element {
         page: 1,
         limit: 25,
         sortField: 'created_at',
-        sortOrder: 'asc'
+        sortOrder: 'desc'
     });
     const { 
         reports, 
@@ -51,11 +52,7 @@ const ReportsList = forwardRef(function ReportsList(props, ref): JSX.Element {
     return (
         <div className="p-grid">
             {(reports?.data && reports.data.map((report, index) => (
-                <div key={index} className="p-col-12">
-                    <div className="p-card">
-                        <div dangerouslySetInnerHTML={{ __html: report.body }} />
-                    </div>
-                </div>
+                <Report report={report} key={index} />
             )))}
         </div>
     );

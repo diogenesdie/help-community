@@ -117,6 +117,14 @@ export const getPrivateTokenFromHeader = (req: NextApiRequest | ReqServerSidePro
  * @returns Dados da sessão de autenticação
  */
 export const getLoginSession = async (req: NextApiRequest | ReqServerSideProps, validateSession: boolean = true): Promise<ISession> => {
+    if( !validateSession ){
+        return {
+            private_token: '',
+            public_token: '',
+            expires_at: new Date(),
+            user: null
+        } as ISession;
+    }
     let erro: IResponseError | null = null;
 
     // Validação do token

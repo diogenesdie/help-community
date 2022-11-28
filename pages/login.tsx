@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/router';
 import Image from 'next/image';
 import logoPrimary from '@/public/images/logo-help-community-primary.png';
@@ -10,11 +10,14 @@ import { classNames } from "primereact/utils";
 import { login } from '@/services/authenticate-service';
 import { useAuthenticate } from '@/hooks/authenticate-hook';
 import { ProgressBar } from 'primereact/progressbar';
+import { IResponseError } from '@/types/response';
 
 interface ILoginState {
     username: string;
     password: string;
 };
+
+type ILoginField = keyof ILoginState;
 
 interface ILoginErrors {
     username: string | boolean;
@@ -32,8 +35,10 @@ const LoginPage = (): JSX.Element => {
         password: ''
     });
     const [errors, setErrors] = useState<ILoginErrors>(templateErrors);
-    const { session, sessionError, isLoadingSession } = useAuthenticate();
+    const { session, sessionError, isLoadingSession, showDialog } = useAuthenticate();
     const router = useRouter();
+    const [isLogin, setIsLogin] = useState<boolean>(false);
+    const [isLoginOk, setIsLoginOk] = useState<boolean>(false);
 
     useEffect(() => {
         if( !session || sessionError ) {
@@ -59,10 +64,25 @@ const LoginPage = (): JSX.Element => {
         }));
     };
 
+    const dispatchErrors = useCallback((err: IResponseError): void => {
+        setErrors((prevErrors) => {
+            let newErrors = {...prevErrors};
+
+            if(err.fields) {            
+                err.fields.forEach((field) => {
+                    newErrors[field.field as ILoginField] = field.message || false;
+                });
+            }
+
+            return newErrors;
+        });
+    }, [setErrors]);
+
     const onSubmit = async (e: any) => {
         e.preventDefault();
+        setErrors(templateErrors);
         const { username, password } = state;
-        console.log(state)
+
         if( !username ) {
             setErrors(prevErrors => ({
                 ...prevErrors,
@@ -78,16 +98,22 @@ const LoginPage = (): JSX.Element => {
         }
 
         try {
+            setIsLogin(true);
             if( username && password ) {
                 await login({
                     username,
                     password
                 });
             }
-        } catch (error) {
-            console.log(error);
+            setIsLoginOk(true);
+
+            router.push('/');
+            
+        } catch (error: any) {
+            dispatchErrors(error);
         }
 
+        setIsLogin(false);
     }
 
     if( (session && !sessionError) || isLoadingSession ) {
@@ -107,28 +133,17 @@ const LoginPage = (): JSX.Element => {
             {session && (
                 <span>Logado</span>
             )}
-            <div className="flex w-6 bg-primary">
+            <div className="flex w-4 bg-primary">
                 <div className="flex flex-column align-items-center justify-content-center w-full relative">
                     <Image src={logo} alt="Help Community Logo" width={400}/>
                     <h2 className="roboto">be the help that you looking for</h2>
                 </div>
-                <svg className="waves absolute rotate-90" preserveAspectRatio="none" shape-rendering="auto" style={{width: '125vw', right: '-235'}} viewBox="0 24 150 28">
-                    <defs>
-                        <path id="gentle-wave" d="M-160 44c30 0 58-18 88-18s 58 18 88 18 58-18 88-18 58 18 88 18 v44h-352z" />
-                    </defs>
-                    <g className="parallax">
-                        <use x="48" y="0" fill="rgba(255,255,255,0.7" xlinkHref="#gentle-wave" />
-                        <use x="48" y="3" fill="rgba(255,255,255,0.5)" xlinkHref="#gentle-wave" />
-                        <use x="48" y="5" fill="rgba(255,255,255,0.3)" xlinkHref="#gentle-wave" />
-                        <use x="48" y="7" fill="#fff" xlinkHref="#gentle-wave" />
-                    </g>
-                </svg>
             </div>
-            <div className="p-fluid flex w-6 align-items-center justify-content-center">
-                <div className="flex flex-wrap align-items-center justify-content-center h-10rem gap-3 w-6">
+            <div className="p-fluid flex w-8 align-items-center justify-content-center">
+                <div className="flex flex-wrap align-items-center justify-content-center w-4 gap-3">
                     <Image src={logoPrimary} alt="Help Community Logo" width={250}  />
                     <div className="p-field w-full">
-                        <label htmlFor="username">Username</label>
+                        <label htmlFor="username" className="block text-900 font-medium mb-2">Username</label>
                         <InputText 
                             id="username"
                             name="username"
@@ -144,7 +159,7 @@ const LoginPage = (): JSX.Element => {
                         {errors.username && <small className="p-error">{errors.username}</small>}
                     </div>
                     <div className="p-field w-full">
-                        <label htmlFor="password">Password</label>
+                        <label htmlFor="password" className="block text-900 font-medium mb-2">Password</label>
                         <Password 
                             id="password"
                             name="password"
@@ -164,7 +179,9 @@ const LoginPage = (): JSX.Element => {
                         <Button 
                             label="Login"
                             className="p-button-raised w-full"
+                            icon="pi pi-sign-in"
                             onClick={onSubmit}
+                            loading={isLoginOk || isLogin}
                         />
                     </div>
                 </div>

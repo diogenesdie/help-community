@@ -1,4 +1,4 @@
-import { IFiltersReports, IReportPayload } from "@/data/report/source";
+import { IFiltersReports, IReportPayload, IReportReturnPayload } from "@/data/report/source";
 import { validateReportPayload } from "@/data/report/validation";
 import { IResponseError } from "@/types/response";
 import { IListRecords } from "@/types/api";
@@ -10,16 +10,16 @@ import client from "@/config/http";
  * 
  * @param {IFiltersReports} filters
  * 
- * @returns {Promise<IReportPayload[]>}
+ * @returns {Promise<IReportReturnPayload[]>}
  */
-export const getReports = async (filters?: IFiltersReports): Promise<IListRecords<IReportPayload>> => {
+export const getReports = async (filters?: IFiltersReports): Promise<IListRecords<IReportReturnPayload>> => {
     const response = await client.get('/api/reports', { params: filters });
 
     if( response.status !== 200 ) {
         throw response.data as IResponseError;
     }
 
-    return response.data as IListRecords<IReportPayload>;
+    return response.data as IListRecords<IReportReturnPayload>;
 }
 
 /**

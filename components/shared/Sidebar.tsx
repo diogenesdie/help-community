@@ -58,6 +58,23 @@ const Sidebar = (props: SidebarProps): JSX.Element => {
                 visible: true,
                 template: getItemTemplate
             });
+            items.push({
+                key: 'LOGOUT',
+                label: 'Logout',
+                icon: 'pi-sign-out',
+                url: '/logout',
+                visible: true,
+                template: getItemTemplate
+            });
+        } else {
+            items.push({
+                key: 'LOGIN',
+                label: 'Login',
+                icon: 'pi-sign-in',
+                url: '/login',
+                visible: true,
+                template: getItemTemplate
+            });
         }
         return items;
 

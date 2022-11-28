@@ -1,4 +1,4 @@
-import { ISession } from "@/types/authenticate";
+import { ISession, IUser } from "@/types/authenticate";
 import { report } from "@prisma/client";
 import { getSequence } from "@/config/prisma";
 import prisma from "@/config/prisma";
@@ -11,7 +11,12 @@ export interface IReportMediaPayload {
 
 export interface IReportPayload {
     body: string;
-    medias: IReportMediaPayload[]; 
+    medias: IReportMediaPayload[];
+}
+
+export interface IReportReturnPayload extends IReportPayload {
+    user: IUser;
+    votes?: number;
 }
 
 export interface IFiltersReports extends IListRecordsPayload {
@@ -19,11 +24,11 @@ export interface IFiltersReports extends IListRecordsPayload {
     status: 'A';
     page: number;
     limit: number;
-    sortField: 'created_at' | 'updated_at';
+    sortField: 'created_at' | 'updated_at' | 'votes';
     sortOrder: 'asc' | 'desc'
 }
 
-export const getReports = async (session: ISession, filters: IFiltersReports): Promise<IListRecords<IReportPayload>> => {
+export const getReports = async (session: ISession, filters: IFiltersReports): Promise<IListRecords<IReportReturnPayload>> => {
     const normalizedFilters = validateFilters(filters);
     const where = {
         OR: [
@@ -38,12 +43,13 @@ export const getReports = async (session: ISession, filters: IFiltersReports): P
     const reports = await prisma.report.findMany({
         where: where,
         orderBy: {
-            [normalizedFilters.sortField]: normalizedFilters.sortOrder
+            [normalizedFilters.sortField]: normalizedFilters.sortOrder,
         },
         skip: (normalizedFilters.page - 1) * normalizedFilters.limit,
         take: normalizedFilters.limit,
         include: {
-            report_media: true
+            report_media: true,
+            user: true
         }
     });
 
@@ -51,8 +57,13 @@ export const getReports = async (session: ISession, filters: IFiltersReports): P
         body: report.body,
         medias: report.report_media.map(media => ({
             base64: media.base64
-        }))
-    } as IReportPayload));
+        })),
+        votes: report.votes,
+        user: {
+            id: report.user?.user_id,
+            username: report.user?.username
+        }
+    } as IReportReturnPayload));
 
     const totalData = await prisma.report.count({
         where: where
@@ -63,7 +74,7 @@ export const getReports = async (session: ISession, filters: IFiltersReports): P
         page: normalizedFilters.page!,
         totalData: totalData,
         totalPages: Math.ceil(totalData / normalizedFilters.limit!),
-    } as IListRecords<IReportPayload>;
+    } as IListRecords<IReportReturnPayload>;
 }
 
 export const insertReport = async (session: ISession, payload: IReportPayload) => {

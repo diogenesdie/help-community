@@ -8,8 +8,8 @@ import { IFiltersReports } from '@/data/report/source';
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     if( req.method === 'GET' ) {
         try{
-            const session = await getLoginSession(req);
-            const filters: IFiltersReports = req.query.filters as any;
+            const session = await getLoginSession(req, false);
+            const filters: IFiltersReports = req.query as any;
     
             const reports = await getReports(session, filters);
     
@@ -22,7 +22,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     
     } else if( req.method === 'POST' ) {
         try {
-            const session = await getLoginSession(req);
+            const session = await getLoginSession(req, false);
 
             const data: IReportPayload = req.body;
             const newReport = await insertReport(session, data);

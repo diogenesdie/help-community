@@ -32,6 +32,7 @@ model report {
   created_at      DateTime          @default(now()) @db.Timestamp(6)
   updated_at      DateTime          @default(now()) @db.Timestamp(6)
   status          String            @default("PENDING") @db.VarChar(20)
+  votes           Int               @default(0)
   user            user?             @relation(fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "reports_users_fk")
   report_feedback report_feedback[]
   report_media    report_media[]
@@ -59,8 +60,8 @@ model city {
 
   @@unique([indexed_name, state_id], map: "city_indexed_name_un")
   @@unique([name, state_id], map: "city_name_un")
-  @@index([indexed_name])
   @@index([indexed_name, state_id], map: "city_indexed_name_state_idx")
+  @@index([indexed_name])
 }
 
 model country {
