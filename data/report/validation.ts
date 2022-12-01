@@ -100,7 +100,7 @@ export const validateReportPayload = (payload: IReportPayload) => {
     if( errors.length > 0 ) {
         throw {
             name: 'VALIDATION_ERROR',
-            message: 'Invalid payload',
+            message: 'One or more fields are invalid',
             fields: errors 
         } as IResponseError;
     }
