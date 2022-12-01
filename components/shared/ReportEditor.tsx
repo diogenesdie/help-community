@@ -212,7 +212,7 @@ const ReportEditor = (props: ReportEditorProps): JSX.Element => {
 
             if( error.fields && error.fields.length > 0 ) {
                 showDialog({
-                    title: 'Error',
+                    title: 'Validation error',
                     message: error.message,
                     button_text: 'Ok',
                     type: 'error'
