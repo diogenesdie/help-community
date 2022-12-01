@@ -210,12 +210,14 @@ const ReportEditor = (props: ReportEditorProps): JSX.Element => {
         } catch (error: any) {
             dispatchError(error);
 
-            showDialog({
-                title: 'Error',
-                message: error.message,
-                button_text: 'Ok',
-                type: 'error'
-            });
+            if( isEmpty(error.fields) ){
+                showDialog({
+                    title: 'Error',
+                    message: error.message,
+                    button_text: 'Ok',
+                    type: 'error'
+                });
+            }
         }
 
         setIsLoading(false);
