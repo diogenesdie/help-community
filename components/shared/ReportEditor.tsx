@@ -9,10 +9,10 @@ import { BlockUI } from 'primereact/blockui';
 import { useAuthenticate } from '@/hooks/authenticate-hook';
 import { isEmpty } from '@/utils/string-utils';
 import { classNames } from 'primereact/utils';
-import SelectCity from './SelectCity';
-import SelectDistrict from './SelectDistrict';
+import SelectCity from '@/components/shared/SelectCity';
+import SelectDistrict from '@/components/shared/SelectDistrict';
 import { IErrorField } from '@/types/response';
-import SelectCategory from './SelectCategory';
+import SelectCategory from '@/components/shared/SelectCategory';
 import { useTranslation } from 'next-i18next';
 
 export interface ReportEditorProps {

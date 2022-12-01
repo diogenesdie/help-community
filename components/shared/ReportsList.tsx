@@ -7,9 +7,9 @@ import { ProgressBar } from 'primereact/progressbar';
 import { forwardRef, useImperativeHandle } from "react";
 import Report from "@/components/shared/Report";
 import { Dropdown } from "primereact/dropdown";
-import SelectCity from "./SelectCity";
-import SelectDistrict from "./SelectDistrict";
-import SelectCategory from "./SelectCategory";
+import SelectCity from "@/components/shared/SelectCity";
+import SelectDistrict from "@/components/shared/SelectDistrict";
+import SelectCategory from "@/components/shared/SelectCategory";
 import { Button } from "primereact/button";
 import { useTranslation } from "next-i18next";
 

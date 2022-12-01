@@ -163,16 +163,17 @@ const hasBadWords = (text: string): boolean => {
 
 
 const verifySpam = async (session: ISession): Promise<boolean> => {
+    // need wait 10 minutes to send another report
     const reportsCount = await prisma.report.count({
         where: {
             user_id: session.user?.id,
             created_at: {
-                gte: new Date(new Date().getTime() - (1000 * 60 * 60 * 24))
+                gte: new Date(new Date().getTime() - 10 * 60 * 1000)
             }
         }
     });
 
-    if (reportsCount >= 5) {
+    if (reportsCount >= 1) {
         return true;
     }
 
@@ -290,7 +291,7 @@ export const insertReport = async (session: ISession, payload: IReportPayload) =
     if (verifySpamResult) {
         throw {
             name: 'NOT_ALLOWED',
-            message: 'You can not create more than 5 reports per day'
+            message: 'You need wait 10 minutes to send another report'
         } as IResponseError;
     }
 
