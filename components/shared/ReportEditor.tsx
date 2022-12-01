@@ -88,7 +88,7 @@ const ReportEditor = (props: ReportEditorProps): JSX.Element => {
                             mode="basic"
                             name="demo[]"
                             accept="image/*" 
-                            maxFileSize={1000000} 
+                            maxFileSize={1000000000} 
                             customUpload 
                             uploadHandler={customBase64Uploader}
                             auto
