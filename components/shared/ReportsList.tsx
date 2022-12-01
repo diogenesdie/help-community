@@ -122,7 +122,7 @@ const ReportsList = forwardRef(function ReportsList(props, ref): JSX.Element {
             {(reports?.data && reports.data.length && reports.data.map((report, index) => (
                 <Report report={report} key={index} />
             )) || (isLoadingReports && (
-                <div className="p-d-flex p-jc-center p-ai-center p-p-4">
+                <div className="p-d-flex p-jc-center p-ai-center p-p-4 mt-4">
                     <ProgressBar mode="indeterminate" />
                 </div>
             )) || (
