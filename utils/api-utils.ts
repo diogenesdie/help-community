@@ -32,6 +32,7 @@ import { isEmpty } from '@/utils/string-utils'
 
         } else if(err.name === 'UNAUTHORIZED') {
             error.status = 401;
+            error.message = 'You must be logged in to access this resource';
 
         } else {
             error.status = 500;

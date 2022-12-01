@@ -10,9 +10,12 @@ export const validateFilters = (filters: IFiltersReports): IFiltersReports => {
         status: filters?.status || '',
         sortField: filters?.sortField || 'created_at',
         sortOrder: filters?.sortOrder || 'asc',
+        city: filters?.city || '',
+        district: filters?.district || '',
+        category: filters?.category || ''
     };
 
-    const validSortFields = ['created_at','updated_at'];
+    const validSortFields = ['created_at','updated_at','votes'];
 
     if( 
         Number.isNaN(normalizedFilters.page) ||
@@ -73,8 +76,33 @@ export const validateReportPayload = (payload: IReportPayload) => {
         });
     }
 
+    if( !payload.city ) {
+        errors.push({
+            field: 'city_id',
+            message: 'City is required'
+        });
+    }
+
+    if( !payload.district ) {
+        errors.push({
+            field: 'district_id',
+            message: 'District is required'
+        });
+    }
+
+    if( !payload.category ) {
+        errors.push({
+            field: 'category_id',
+            message: 'Category is required'
+        });
+    }
+
     if( errors.length > 0 ) {
-        throw errors;
+        throw {
+            name: 'VALIDATION_ERROR',
+            message: 'Invalid payload',
+            fields: errors 
+        } as IResponseError;
     }
 
     return payload;

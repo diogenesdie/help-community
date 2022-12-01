@@ -5,6 +5,8 @@ import { PanelMenu } from "primereact/panelmenu";
 import { classNames } from "primereact/utils";
 import logo from '@/public/images/logo-help-community-primary.png';
 import { useCallback, useMemo } from "react";
+import { Button } from "primereact/button";
+import { logout } from "@/services/authenticate-service";
 
 export interface SidebarProps {
     currentMenu?: string | null | undefined;
@@ -15,22 +17,23 @@ export interface SidebarMenuItem {
     icon?: string;
     url?: string;
     template?: Function;
-    command?: () => void;
+    command?: (e: any) => void;
     visible?: boolean;
     items?: Array<SidebarMenuItem>;
 }
 
 const Sidebar = (props: SidebarProps): JSX.Element => {
-    const { session } = useAuthenticate();
+    const { session, showDialog } = useAuthenticate();
 
-    const getItemTemplate = useCallback((item: SidebarMenuItem): JSX.Element => {
+    const getItemTemplate = useCallback((item: SidebarMenuItem): JSX.Element => { 
         return (
             <Link 
                 href={item.url || ''} 
                 className={classNames(
                     "p-ripple flex align-items-center cursor-pointer p-3 border-round text-700 transition-duration-150 transition-colors w-full no-underline",
                     props.currentMenu === item.key ? "surface-100" : "hover:surface-100"
-                )}                        
+                )}                  
+                onClick={item.command}      
             >
                 <i className={classNames('pi mr-2', item.icon)}></i> <span className="font-medium">{item.label}</span>
             </Link>
@@ -51,20 +54,26 @@ const Sidebar = (props: SidebarProps): JSX.Element => {
 
         if( session?.user ) {
             items.push({
-                key: 'PROFILE',
-                label: 'Profile',
-                icon: 'pi-users',
-                url: `/${session.user?.username}`,
-                visible: true,
-                template: getItemTemplate
-            });
-            items.push({
                 key: 'LOGOUT',
                 label: 'Logout',
                 icon: 'pi-sign-out',
-                url: '/logout',
+                url: '',
                 visible: true,
-                template: getItemTemplate
+                template: getItemTemplate,
+                command: async (e) => {
+                    e.preventDefault();
+                    try {
+                        await logout();
+                    } catch (error: any) {
+                        showDialog({
+                            title: 'Error',
+                            message: error.message,
+                            button_text: 'Ok',
+                            type: 'error'
+                        });
+                    }
+                    window.location.reload();
+                }
             });
         } else {
             items.push({
@@ -80,7 +89,8 @@ const Sidebar = (props: SidebarProps): JSX.Element => {
 
     }, [
         getItemTemplate, 
-        session
+        session,
+        showDialog
     ]);
 
     return (

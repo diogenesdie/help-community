@@ -65,3 +65,17 @@ a>button {
     transform: translate3d(85px,0,0);
   }
 }
+.custom-scroll::-webkit-scrollbar{
+	width: 2px;
+  height: 8px;
+}
+
+.custom-scroll::-webkit-scrollbar-track{
+	background: var(--surface-ground);
+	border-radius: 3px;
+}
+
+.custom-scroll::-webkit-scrollbar-thumb{
+	background-color: var(--primary-color);
+	border-radius: 1px;
+}

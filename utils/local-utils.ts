@@ -28,10 +28,10 @@ export const getOS = (): string => {
 /**
  * Save session in cookie
  * 
- * @param sessao Session data
+ * @param session Session data
  */
-export const setLocals = (sessao: ISession): void => {
-    set<ISession>('session', sessao);
+export const setLocals = (session: ISession): void => {
+    set<ISession>('session', session);
 };
 
 /**

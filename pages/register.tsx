@@ -5,39 +5,43 @@ import logoPrimary from '@/public/images/logo-help-community-primary.png';
 import { InputText } from 'primereact/inputtext';
 import { Button } from 'primereact/button';
 import { classNames } from "primereact/utils";
-import { login } from '@/services/authenticate-service';
+import { register } from '@/services/authenticate-service';
 import { useAuthenticate } from '@/hooks/authenticate-hook';
 import { ProgressBar } from 'primereact/progressbar';
 import { IResponseError } from '@/types/response';
 import Link from 'next/link';
 
-interface ILoginState {
+interface IRegisterState {
     username: string;
     password: string;
+    confirm_password: string;
 };
 
-type ILoginField = keyof ILoginState;
+type IRegisterField = keyof IRegisterState;
 
-interface ILoginErrors {
+interface IRegisterErrors {
     username: string | boolean;
     password: string | boolean;
+    confirm_password: string | boolean;
 };
 
 const templateErrors = {
     username: false,
-    password: false
+    password: false,
+    confirm_password: false
 };
 
-const LoginPage = (): JSX.Element => {
-    const [state, setState] = useState<ILoginState>({
+const RegisterPage = (): JSX.Element => {
+    const [state, setState] = useState<IRegisterState>({
         username: '',
-        password: ''
+        password: '',
+        confirm_password: ''
     });
-    const [errors, setErrors] = useState<ILoginErrors>(templateErrors);
-    const { session, sessionError, isLoadingSession, showDialog } = useAuthenticate();
+    const [errors, setErrors] = useState<IRegisterErrors>(templateErrors);
+    const { session, sessionError, isLoadingSession } = useAuthenticate();
     const router = useRouter();
-    const [isLogin, setIsLogin] = useState<boolean>(false);
-    const [isLoginOk, setIsLoginOk] = useState<boolean>(false);
+    const [isRegister, setIsRegister] = useState<boolean>(false);
+    const [isRegisterOk, setIsRegisterOk] = useState<boolean>(false);
 
     useEffect(() => {
         if( !session || sessionError ) {
@@ -69,7 +73,7 @@ const LoginPage = (): JSX.Element => {
 
             if(err.fields) {            
                 err.fields.forEach((field) => {
-                    newErrors[field.field as ILoginField] = field.message || false;
+                    newErrors[field.field as IRegisterField] = field.message || false;
                 });
             }
 
@@ -80,7 +84,7 @@ const LoginPage = (): JSX.Element => {
     const onSubmit = async (e: any) => {
         e.preventDefault();
         setErrors(templateErrors);
-        const { username, password } = state;
+        const { username, password, confirm_password } = state;
 
         if( !username ) {
             setErrors(prevErrors => ({
@@ -96,21 +100,41 @@ const LoginPage = (): JSX.Element => {
             }));
         }
 
+        if( !confirm_password ) {
+            setErrors(prevErrors => ({
+                ...prevErrors,
+                confirm_password: 'Confirm password is required'
+            }));
+        }
+
+        if( password !== confirm_password ) {
+            setErrors(prevErrors => ({
+                ...prevErrors,
+                confirm_password: 'Passwords do not match'
+            }));
+        }
+
         try {
-            setIsLogin(true);
-            if( username && password ) {
-                await login({
+            setIsRegister(true);
+            console.log('Registering...');
+            console.log(username, password, confirm_password);
+            if( username && password && confirm_password) {
+                await register({
                     username,
-                    password
+                    password,
+                    confirm_password
                 });
+                setIsRegisterOk(true);
+            } else {
+                setIsRegisterOk(false);
             }
-            setIsLoginOk(true);
             
         } catch (error: any) {
+            setIsRegisterOk(false);
             dispatchErrors(error);
         }
 
-        setIsLogin(false);
+        setIsRegister(false);
     }
 
     if( (session && !sessionError) || isLoadingSession ) {
@@ -129,14 +153,7 @@ const LoginPage = (): JSX.Element => {
             <div className="surface-card p-4 shadow-2 border-round w-full lg:w-4">
                 <div className="text-center mb-5">
                     <Image src={logoPrimary} alt="Help Community Logo" width={250}  />
-                    <div className="text-900 text-3xl font-medium mb-3">Welcome Back</div>
-                    <span className="text-600 font-medium line-height-3">Dont have an account?</span>
-                    <Link 
-                        className="font-medium no-underline ml-2 text-blue-500 cursor-pointer"
-                        href="/register"
-                    >
-                        Create today!
-                    </Link>
+                    <div className="text-900 text-3xl font-medium mb-3">Create your account</div>
                 </div>
 
                 <div>
@@ -170,20 +187,27 @@ const LoginPage = (): JSX.Element => {
                         maxLength={100}
                     />
                     {errors.password && <small className="p-error">{errors.password}</small>}
-                    <div className="flex align-items-center justify-content-between mb-6 mt-2">
-                        <div className="flex align-items-center">
-                            {/* <Checkbox id="rememberme" className="mr-2" checked={checked1} onChange={(e) => setChecked1(e.checked)} /> */}
-                            {/* <label htmlFor="rememberme">Remember me</label> */}
-                        </div>
-                        {/* <a className="font-medium no-underline ml-2 text-blue-500 text-right cursor-pointer">Forgot your password?</a> */}
-                    </div>
-
+                    <label htmlFor="confirm_password" className="block text-900 font-medium mb-2 mt-3">Confirm Password</label>
+                    <InputText
+                        id="confirm_password"
+                        name="confirm_password"
+                        type="password"
+                        value={state.confirm_password}
+                        className={classNames({
+                            'p-invalid': Boolean(errors.confirm_password),
+                            'w-full': true
+                        })}
+                        placeholder="Confirm Password"
+                        onChange={handleChange}
+                        maxLength={100}
+                    />
+                    {errors.confirm_password && <small className="p-error">{errors.confirm_password}</small>}
                     <Button 
-                        label="Sign In"
+                        label="Register"
                         icon="pi pi-user"
-                        className="w-full"  
+                        className="w-full mt-3"  
                         onClick={onSubmit}
-                        loading={isLoginOk || isLogin}
+                        loading={isRegisterOk || isRegister}
                     />
                 </div>
             </div>
@@ -193,4 +217,4 @@ const LoginPage = (): JSX.Element => {
     )
 }
 
-export default LoginPage
+export default RegisterPage

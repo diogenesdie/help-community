@@ -1667,6 +1667,11 @@ react-is@^16.13.1:
   resolved "https://registry.npmjs.org/react-is/-/react-is-16.13.1.tgz"
   integrity sha512-24e6ynE2H+OKt4kqsOvNd8kBpV65zoxbA4BVsEOB3ARVWQki/DHzaUoC5KuON/BiccDaCCTZBuOcfZs70kR8bQ==
 
+react-simple-image-viewer@^1.2.2:
+  version "1.2.2"
+  resolved "https://registry.yarnpkg.com/react-simple-image-viewer/-/react-simple-image-viewer-1.2.2.tgz#2a93413512b76ce8d336dd5fa19660a970d05be4"
+  integrity sha512-Vk9p6Glm7uE4cSEBGkqZPGC3qoZcAwd48nq5/JN13NKd9rUrUIWZWFEmRzO+FVwl6c0UdjSDkthGoaoiYeWVjg==
+
 react-transition-group@^4.4.1:
   version "4.4.5"
   resolved "https://registry.npmjs.org/react-transition-group/-/react-transition-group-4.4.5.tgz"

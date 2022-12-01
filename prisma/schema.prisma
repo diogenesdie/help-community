@@ -33,6 +33,12 @@ model report {
   updated_at      DateTime          @default(now()) @db.Timestamp(6)
   status          String            @default("PENDING") @db.VarChar(20)
   votes           Int               @default(0)
+  city_id         Int
+  district_id     Int
+  category_id     Int
+  category        category          @relation(fields: [category_id], references: [category_id], onDelete: NoAction, onUpdate: NoAction, map: "report_category_fk")
+  city            city              @relation(fields: [city_id], references: [city_id], onDelete: NoAction, onUpdate: NoAction, map: "report_city_fk")
+  district        district          @relation(fields: [district_id], references: [district_id], onDelete: NoAction, onUpdate: NoAction, map: "report_district_fk")
   user            user?             @relation(fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "reports_users_fk")
   report_feedback report_feedback[]
   report_media    report_media[]
@@ -49,14 +55,16 @@ model report_feedback {
 }
 
 model city {
-  city_id      Int      @id(map: "city_pk")
-  name         String   @db.VarChar(200)
-  status       String   @default("A") @db.Char
-  indexed_name String   @db.VarChar(200)
+  city_id      Int        @id(map: "city_pk")
+  name         String     @db.VarChar(200)
+  status       String     @default("A") @db.Char
+  indexed_name String     @db.VarChar(200)
   state_id     Int
-  created_at   DateTime @default(now()) @db.Timestamp(6)
-  updated_at   DateTime @default(now()) @db.Timestamp(6)
-  state        state    @relation(fields: [state_id], references: [state_id], onDelete: NoAction, onUpdate: NoAction, map: "city_fk")
+  created_at   DateTime   @default(now()) @db.Timestamp(6)
+  updated_at   DateTime   @default(now()) @db.Timestamp(6)
+  state        state      @relation(fields: [state_id], references: [state_id], onDelete: NoAction, onUpdate: NoAction, map: "city_fk")
+  district     district[]
+  report       report[]
 
   @@unique([indexed_name, state_id], map: "city_indexed_name_un")
   @@unique([name, state_id], map: "city_name_un")
@@ -118,5 +126,31 @@ model state {
   @@unique([indexed_name, country_id], map: "state_indexed_name_un")
   @@unique([name, country_id], map: "state_name_un")
   @@index([indexed_name, country_id], map: "state_indexed_name_country_idx")
+  @@index([indexed_name])
+}
+
+model district {
+  district_id  Int      @id(map: "district_pk")
+  name         String   @db.VarChar(200)
+  status       String   @default("A") @db.Char
+  city_id      Int
+  created_at   DateTime @default(now()) @db.Timestamp(6)
+  updated_at   DateTime @default(now()) @db.Timestamp(6)
+  indexed_name String   @db.VarChar(200)
+  city         city     @relation(fields: [city_id], references: [city_id], onDelete: NoAction, onUpdate: NoAction, map: "district_fk")
+  report       report[]
+
+  @@unique([indexed_name, city_id], map: "district_indexed_name_un")
+}
+
+model category {
+  category_id  Int      @id(map: "category_pk")
+  name         String   @db.VarChar(200)
+  status       String   @default("A") @db.Char
+  indexed_name String   @db.VarChar(200)
+  created_at   DateTime @default(now()) @db.Timestamp(6)
+  updated_at   DateTime @default(now()) @db.Timestamp(6)
+  report       report[]
+
   @@index([indexed_name])
 }

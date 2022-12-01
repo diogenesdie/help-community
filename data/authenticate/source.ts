@@ -1,6 +1,6 @@
 import { IResponseError } from "@/types/response"
-import { ILoginPaylod, ISession } from "@/types/authenticate"
-import { validateLogin } from "@/data/authenticate/validation"
+import { ILoginPaylod, IRegisterPayload, ISession } from "@/types/authenticate"
+import { validateLogin, validateRegister } from "@/data/authenticate/validation"
 import prisma, { getSequence } from "@/config/prisma";
 import { encrypt, generateToken } from "@/utils/crypto-utils";
 
@@ -80,6 +80,71 @@ export const doLogin = async (data: ILoginPaylod): Promise<ISession> => {
         id: session_id
     } as ISession;
         
+}
+
+export const doRegister = async (data: IRegisterPayload): Promise<ISession> => {
+    const formatedData = validateRegister(data);
+
+    const user = await prisma.user.findFirst({
+        where: {
+            username: formatedData.username
+        }
+    });
+
+    if( user ) {
+        throw {
+            name: 'NOT_ALLOWED',
+            message: 'User already exists',
+            fields: [
+                {
+                    field: 'username',
+                    message: 'User already exists'
+                }
+            ]
+        } as IResponseError;
+    }
+
+    const user_id = await getSequence('help_community.seq_user');
+    const session_id = await getSequence('help_community.seq_session');
+
+    const encryptedPassword = encrypt(formatedData.password);
+
+    await prisma.user.create({
+        data: {
+            user_id: user_id,
+            username: formatedData.username,
+            password: encryptedPassword,
+            admin: '0',
+            status: 'A',
+            created_at: new Date(),
+            updated_at: new Date()
+        }
+    });
+
+    const session = await prisma.session.create({
+        data: {
+            session_id: session_id,
+            user_id: user_id,
+            public_token: generateToken(32),
+            private_token: generateToken(32),
+            status: 'A',
+            created_at: new Date(),
+            updated_at: new Date(),
+            expires_at: new Date(new Date().getTime() + 1000 * 60 * 60 * 24 * 30)
+        }
+    });
+
+    return {
+        user: {
+            id: user_id,
+            username: formatedData.username,
+            admin: false
+        },
+        public_token: session.public_token,
+        private_token: session.private_token,
+        expires_at: session.expires_at,
+        id: session_id
+    } as ISession;
 }
 
 export const doLogout = async (session: ISession) => {

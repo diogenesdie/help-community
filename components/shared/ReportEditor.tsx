@@ -8,12 +8,40 @@ import { IReportMediaPayload, IReportPayload } from "@/data/report/source"
 import { BlockUI } from 'primereact/blockui';
 import { useAuthenticate } from '@/hooks/authenticate-hook';
 import { isEmpty } from '@/utils/string-utils';
+import { classNames } from 'primereact/utils';
+import SelectCity from './SelectCity';
+import SelectDistrict from './SelectDistrict';
+import { IErrorField, IResponseError } from '@/types/response';
+import SelectCategory from './SelectCategory';
 
-const ReportEditor = (): JSX.Element => {
+export interface ReportEditorProps {
+    onSave: () => void;
+}
+
+export interface IReportEditorErrors {
+    text: string | boolean;
+    city_id: string | boolean;
+    district_id: string | boolean;
+    category_id: string | boolean;
+}
+
+export type TReportErrorField = keyof IReportEditorErrors;
+
+const ReportEditor = (props: ReportEditorProps): JSX.Element => {
     const [text, setText] = useState<string>('');
     const [medias, setMedias] = useState<Array<string>>([]);
-    const fileUploadRef = useRef<FileUpload>(null);
+    const [city, setCity] = useState<string>('');
+    const [district, setDistrict] = useState<string>('');
+    const [category, setCategory] = useState<string>('');
     const [isLoading, setIsLoading] = useState<boolean>(false);	
+    const [errors, setErrors] = useState<IReportEditorErrors>({
+        text: false,
+        city_id: false,
+        district_id: false,
+        category_id: false
+    });
+
+    const fileUploadRef = useRef<FileUpload>(null);
     const { showDialog } = useAuthenticate();
 
     const onTextChange = (e: any) => {
@@ -67,6 +95,55 @@ const ReportEditor = (): JSX.Element => {
                         className: 'p-button-text p-button-plain p-2 m-0'
                     }}
                 />
+                <SelectCity
+                    id="city_id"
+                    name="city_id"
+                    placeholder="Select a city"
+                    value={city}
+                    onChange={(e) => {
+                        setCity(e.value);
+                        setDistrict('');
+                        setErrors(prevErrors => ({
+                            ...prevErrors,
+                            city_id: false,
+                            district_id: false,
+                        }));
+                    }}
+                    className={classNames({ 'p-invalid': Boolean(errors.city_id) })}
+                    error={errors.city_id}
+                />
+                <SelectDistrict
+                    id="district_id"
+                    name="district_id"
+                    placeholder="Select a district"
+                    city={city}
+                    value={district}
+                    onChange={(e) => {
+                        setDistrict(e.value);
+                        setErrors(prevErrors => ({
+                            ...prevErrors,
+                            district_id: false,
+                        }));
+                    }}
+                    className={classNames({ 'p-invalid': Boolean(errors.city_id), 'ml-2': true})}
+                    error={errors.district_id}
+                    disabled={isEmpty(city)}
+                />
+                <SelectCategory
+                    id="category_id"
+                    name="category_id"
+                    placeholder="Select a category"
+                    value={category}
+                    onChange={(e) => {
+                        setCategory(e.value);
+                        setErrors(prevErrors => ({
+                            ...prevErrors,
+                            category_id: false,
+                        }));
+                    }}
+                    className={classNames({ 'p-invalid': Boolean(errors.city_id), 'ml-2': true})}
+                    error={errors.category_id}
+                />
             </span>
         );
     }
@@ -78,9 +155,23 @@ const ReportEditor = (): JSX.Element => {
         setMedias([]);
     }
 
+    const dispatchError = (error: any) => {
+        setErrors((prevErrors) => {
+            let novoErros = {...prevErrors};
+
+            if(error.fields) {            
+                error.fields.forEach((field: IErrorField) => {
+                    novoErros[field.field as TReportErrorField] = field.message || false;
+                });            
+            }
+
+            return novoErros;
+        });
+    }
+
     const onClickSave = async () => {
         if( isEmpty(text) ) return 
-        
+
         try {
             setIsLoading(true);
             await insert({
@@ -89,7 +180,10 @@ const ReportEditor = (): JSX.Element => {
                     return {
                         base64: media
                     } as IReportMediaPayload
-                })
+                }),
+                city: city,
+                district: district,
+                category: category
             } as IReportPayload);
 
             
@@ -103,13 +197,10 @@ const ReportEditor = (): JSX.Element => {
                 }
             });
 
+            props.onSave();
+
         } catch (error: any) {
-            showDialog({
-                title: 'Error',
-                message: error.message,
-                button_text: 'Ok',
-                type: 'error'
-            });
+            dispatchError(error);
         }
 
         setIsLoading(false);
@@ -147,17 +238,26 @@ const ReportEditor = (): JSX.Element => {
                     </div>
                 )}
             </div>
-            <div className="flex justify-content-end mt-2 border-top-1 border-primary pt-3">
+            <div className={classNames({
+                'flex justify-content-end mt-2 border-primary pt-3': true,
+                'border-top-1': !isEmpty(text) || medias.length
+            })}>
                 <Button
                     label="Discard"
                     icon="pi pi-times"
-                    className="p-button-text w-3"
+                    className={classNames({
+                        'p-button-text w-3': true,
+                        'hidden': isEmpty(text) && medias.length === 0
+                    })}
                     onClick={onDiscard}
                 />
                 <Button
                     label="Save"
                     icon="pi pi-check"
-                    className="p-button-outlined w-3"
+                    className={classNames({
+                        'p-button-primary w-3': true,
+                        'hidden': isEmpty(text) && medias.length === 0
+                    })}
                     onClick={onClickSave}
                 />
             </div>

@@ -117,14 +117,6 @@ export const getPrivateTokenFromHeader = (req: NextApiRequest | ReqServerSidePro
  * @returns Dados da sessão de autenticação
  */
 export const getLoginSession = async (req: NextApiRequest | ReqServerSideProps, validateSession: boolean = true): Promise<ISession> => {
-    if( !validateSession ){
-        return {
-            private_token: '',
-            public_token: '',
-            expires_at: new Date(),
-            user: null
-        } as ISession;
-    }
     let erro: IResponseError | null = null;
 
     // Validação do token
@@ -134,7 +126,7 @@ export const getLoginSession = async (req: NextApiRequest | ReqServerSideProps, 
         private_token = getPrivateTokenFromHeader(req);
     }
 
-    if ( isEmpty(private_token) ) {
+    if ( isEmpty(private_token) && validateSession ) {
         throw {
             status: 401,
             message: 'Token not found',
@@ -149,28 +141,40 @@ export const getLoginSession = async (req: NextApiRequest | ReqServerSideProps, 
         }
     });
 
-    if ( !session ) {
-        throw {
-            status: 401,
-            message: 'Session not found',
-            name: 'UNAUTHORIZED',
-        }
+    if( validateSession ){
+        if ( !session ) {
+            throw {
+                status: 401,
+                message: 'Session not found',
+                name: 'UNAUTHORIZED',
+            }
+    
+        } else if ( session.status === 'I' )  {
+            throw {
+                status: 401,
+                message: 'Session is inactive',
+                name: 'UNAUTHORIZED',
+            }
+    
+        } else if ( validateSession && session.expires_at && session.expires_at < new Date() ) {
+            throw {
+                status: 401,
+                message: 'Session expired',
+                name: 'UNAUTHORIZED',
+            }
+    
+        } 
+    }
 
-    } else if ( session.status === 'I' )  {
-        throw {
-            status: 401,
-            message: 'Session is inactive',
-            name: 'UNAUTHORIZED',
-        }
-
-    } else if ( validateSession && session.expires_at && session.expires_at < new Date() ) {
-        throw {
-            status: 401,
-            message: 'Session expired',
-            name: 'UNAUTHORIZED',
-        }
-
-    } 
+    if( !session ) {
+        return {
+            private_token: '',
+            public_token: '',
+            expires_at: new Date(),
+            user: null,
+            id: 0
+        } as ISession;
+    }
 
     let user = null;
 
@@ -191,5 +195,6 @@ export const getLoginSession = async (req: NextApiRequest | ReqServerSideProps, 
         expires_at: session.expires_at,
         private_token: session.private_token,
         public_token: session.public_token,
+        id: session.session_id
     } as ISession;
 };

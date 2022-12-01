@@ -1,5 +1,5 @@
 import { IResponseError } from "@/types/response";
-import { ISession, ILoginPaylod } from "@/types/authenticate";
+import { ISession, ILoginPaylod, IRegisterPayload } from "@/types/authenticate";
 import client from "@/config/http";
 import { setLocals, getLocals, clearLocals } from "@/utils/local-utils";
 import { isEmpty } from "@/utils/string-utils";
@@ -42,6 +42,45 @@ export const login = async(data: ILoginPaylod): Promise<ISession> => {
         data: data
     });
 
+    if( response.status !== 200 ) {
+        throw response.data;
+    }
+
+    setLocals(response.data);
+
+    return response.data;
+}
+
+export const logout = async(): Promise<void> => {
+    const locals: ISession = getLocals();
+
+    if( !locals || isEmpty(locals.public_token) ) {
+        throw {
+            name: 'NOT_AUTHENTICATED',
+            message: 'User not authenticated'
+        } as IResponseError;
+    }
+
+    const response = await client({
+        method: 'POST',
+        url: `/api/authenticate/logout`
+    });
+
+    if( response.status !== 200 ) {
+        throw response.data;
+    }
+
+    clearLocals();
+}
+
+export const register = async(data: IRegisterPayload): Promise<ISession> => {
+    console.log(data);
+    const response = await client({
+        method: 'POST',
+        url: '/api/authenticate/register',
+        data: data
+    });
+    
     if( response.status !== 200 ) {
         throw response.data;
     }
