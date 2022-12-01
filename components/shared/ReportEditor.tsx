@@ -11,7 +11,7 @@ import { isEmpty } from '@/utils/string-utils';
 import { classNames } from 'primereact/utils';
 import SelectCity from './SelectCity';
 import SelectDistrict from './SelectDistrict';
-import { IErrorField, IResponseError } from '@/types/response';
+import { IErrorField } from '@/types/response';
 import SelectCategory from './SelectCategory';
 import { useTranslation } from 'next-i18next';
 
@@ -209,6 +209,13 @@ const ReportEditor = (props: ReportEditorProps): JSX.Element => {
 
         } catch (error: any) {
             dispatchError(error);
+
+            showDialog({
+                title: 'Error',
+                message: error.message,
+                button_text: 'Ok',
+                type: 'error'
+            });
         }
 
         setIsLoading(false);

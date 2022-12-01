@@ -84,7 +84,6 @@ const Report = ({ report, key }: { report: IReportReturnPayload, key: number }):
                                 alt="media"
                                 className="border-round-md cursor-pointer"
                                 onClick={() => {
-                                    console.log(index);
                                     setSelectedImage(index)
                                 }}
                             />
