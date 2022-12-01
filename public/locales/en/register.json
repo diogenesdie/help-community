@@ -1,0 +1,26 @@
+{
+    "title": "Create your account",
+    "labels": {
+        "username": "Username",
+        "password": "Password",
+        "confirm-password": "Confirm password",
+        "register": "Register"
+    },
+    "placeholders": {
+        "username": "Type your username",
+        "password": "Type your password",
+        "confirm-password": "Confirm your password"
+    },
+    "validation": {
+        "username": {
+            "required": "Username is required"
+        },
+        "password": {
+            "required": "Password is required"
+        },
+        "confirm-password": {
+            "required": "Confirm password is required",
+            "not-equal": "Passwords do not match"
+        }
+    }
+}

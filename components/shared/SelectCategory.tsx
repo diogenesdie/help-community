@@ -1,4 +1,5 @@
 import { Dropdown, DropdownProps } from 'primereact/dropdown';
+import { useTranslation } from "next-i18next";
 
 export interface SelectCategoryProps extends DropdownProps {
     id: string;
@@ -9,33 +10,35 @@ export interface SelectCategoryProps extends DropdownProps {
 }
 
 const SelectCategory = (props: SelectCategoryProps) => {
+    const { t } = useTranslation(['common', 'categorys']);
+
     const categories = [
         {
-            label: 'Traffic lights',
+            label: t('categorys:TRAFFIC_LIGHTS'),
             value: 'TRAFFIC_LIGHTS',
         },
         {
-            label: 'Roads',
+            label: t('categorys:ROADS'),
             value: 'ROADS',
         },
         {
-            label: 'Potholes',
+            label: t('categorys:POTHOLES'),
             value: 'POTHOLES',
         },
         {
-            label: 'Garbage',
+            label: t('categorys:GARBAGE'),
             value: 'GARBAGE',
         },
         {
-            label: 'Street lights',
+            label: t('categorys:STREET_LIGHTS'),
             value: 'STREET_LIGHTS',
         },
         {
-            label: 'Trees',
+            label: t('categorys:TREES'),
             value: 'TREES',
         },
         {
-            label: 'Other',
+            label: t('categorys:OTHER'),
             value: 'OTHER',
         }
     ]

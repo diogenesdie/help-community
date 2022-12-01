@@ -9,9 +9,9 @@ export interface PaginaPainelProps {
 const AppWrapper = (props: PaginaPainelProps): JSX.Element => {
     return (
         <div className="min-h-screen flex justify-content-center relative w-full lg:static surface-ground">
-            <div className="w-full lg:w-8 flex">
+            <div className="w-full lg:w-8 flex w-full">
                 <Sidebar currentMenu={props.currentMenu} />
-                <div className="flex flex-column flex-auto p-4">
+                <div className="flex flex-column flex-auto p-4 w-screen">
                     {props.children}
                 </div>
             </div>

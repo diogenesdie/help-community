@@ -1,7 +1,8 @@
 
 import AppWrapper from "@/components/shared/AppWrapper";
-import { useState } from "react";
 import Feed from "@/components/shared/Feed";
+import type { GetStaticProps } from 'next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations'; 
 
 const PageFeed = (): JSX.Element => {
     return (
@@ -12,5 +13,11 @@ const PageFeed = (): JSX.Element => {
         </AppWrapper>
     );
 };
+
+export const getStaticProps: GetStaticProps = async ({ locale }) => ({
+    props: {
+        ...(await serverSideTranslations(locale ?? 'pt', ['common','menu','feed','categorys']))
+    }
+});
 
 export default PageFeed;

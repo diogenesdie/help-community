@@ -5,8 +5,9 @@ import { PanelMenu } from "primereact/panelmenu";
 import { classNames } from "primereact/utils";
 import logo from '@/public/images/logo-help-community-primary.png';
 import { useCallback, useMemo } from "react";
-import { Button } from "primereact/button";
 import { logout } from "@/services/authenticate-service";
+import { useTranslation } from "next-i18next";
+import SelectLang from '@/components/shared/SelectLang';
 
 export interface SidebarProps {
     currentMenu?: string | null | undefined;
@@ -16,6 +17,7 @@ export interface SidebarMenuItem {
     label: string;
     icon?: string;
     url?: string;
+    translationKey?: string;
     template?: Function;
     command?: (e: any) => void;
     visible?: boolean;
@@ -24,6 +26,7 @@ export interface SidebarMenuItem {
 
 const Sidebar = (props: SidebarProps): JSX.Element => {
     const { session, showDialog } = useAuthenticate();
+    const { t } = useTranslation('menu');	
 
     const getItemTemplate = useCallback((item: SidebarMenuItem): JSX.Element => { 
         return (
@@ -35,10 +38,10 @@ const Sidebar = (props: SidebarProps): JSX.Element => {
                 )}                  
                 onClick={item.command}      
             >
-                <i className={classNames('pi mr-2', item.icon)}></i> <span className="font-medium">{item.label}</span>
+                <i className={classNames('pi mr-2', item.icon)}></i> <span className="font-medium">{t(`menu:${item.translationKey}`)}</span>
             </Link>
         )
-    }, [props.currentMenu]);
+    }, [props.currentMenu, t]);
 
     let items: Array<SidebarMenuItem> = useMemo<Array<SidebarMenuItem>>(() => {
         let items: Array<SidebarMenuItem> = [];
@@ -46,6 +49,7 @@ const Sidebar = (props: SidebarProps): JSX.Element => {
         items.push({
             key: 'HOME',
             label: 'Home',
+            translationKey: 'items.home',
             icon: 'pi-home',
             url: '/',
             visible: true,
@@ -56,6 +60,7 @@ const Sidebar = (props: SidebarProps): JSX.Element => {
             items.push({
                 key: 'LOGOUT',
                 label: 'Logout',
+                translationKey: 'items.logout',
                 icon: 'pi-sign-out',
                 url: '',
                 visible: true,
@@ -79,6 +84,7 @@ const Sidebar = (props: SidebarProps): JSX.Element => {
             items.push({
                 key: 'LOGIN',
                 label: 'Login',
+                translationKey: 'items.login',
                 icon: 'pi-sign-in',
                 url: '/login',
                 visible: true,
@@ -106,6 +112,9 @@ const Sidebar = (props: SidebarProps): JSX.Element => {
                     <ul className="list-none p-3 m-0">
                         <PanelMenu model={items as any} />
                     </ul>
+                    <div className="flex justify-content-end w-full pr-4">
+                        <SelectLang /> 
+                    </div>
                 </div>
             </div>
         </div>

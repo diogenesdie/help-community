@@ -1,0 +1,25 @@
+{
+    "messages":{
+        "hello": "Olá, {{name}}!",
+        "no-reports-found": "Nenhuma reportagem encontrada."
+    },
+    "title": "Reportagens",
+    "placeholders": {
+        "editor": "Escreva aqui o problema aqui...",
+        "select-category": "Selecione uma categoria",
+        "select-city": "Selecione uma cidade",
+        "select-district": "Selecione um bairro",
+        "filter-category": "Filtrar por categoria",
+        "filter-city": "Filtrar por cidade",
+        "filter-district": "Filtrar por bairro"
+    },
+    "buttons": {
+        "clear-filters": "Limpar filtros"
+    },
+    "order": {
+        "LATEST": "Mais recentes",
+        "OLDEST": "Mais antigas",
+        "MOST_VOTED": "Mais votadas",
+        "LEAST_VOTED": "Menos votadas"
+    }
+}

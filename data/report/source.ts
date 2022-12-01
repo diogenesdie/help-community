@@ -26,7 +26,7 @@ export interface IReportReturnPayload extends IReportPayload {
     votes?: number;
     city: city['name'];
     district: district['name'];
-    category: category['name'];
+    category: category['indexed_name'];
 }
 
 export interface IFiltersReports extends IListRecordsPayload {
@@ -148,7 +148,7 @@ export const getReports = async (session: ISession, filters: IFiltersReports): P
         time: getDescDataPassada(report.created_at),
         city: report.city?.name,
         district: report.district?.name,
-        category: report.category?.name
+        category: report.category?.indexed_name
     } as IReportReturnPayload));
 
     const totalData = await prisma.report.count({

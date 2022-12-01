@@ -1,0 +1,9 @@
+{
+    "TRAFFIC_LIGHTS": "Traffic Lights",
+    "ROADS": "Roads",
+    "POTHOLES": "Potholes",
+    "GARBAGE": "Garbage",
+    "STREET_LIGHTS": "Street Lights",
+    "TREES": "Trees",
+    "OTHER": "Other"
+}

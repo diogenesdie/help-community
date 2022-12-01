@@ -7,9 +7,12 @@ import { classNames } from "primereact/utils";
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import ImageViewer from 'react-simple-image-viewer';
+import { useTranslation } from "next-i18next";
 
 const Report = ({ report, key }: { report: IReportReturnPayload, key: number }): JSX.Element => {
     const { showDialog } = useAuthenticate();
+    const { t } = useTranslation(['common', 'feed']);
+
     const [selectedImage, setSelectedImage] = useState<number | undefined>(undefined);
     const [reportData, setReportData] = useState<IReportReturnPayload>(report);
 
@@ -64,7 +67,7 @@ const Report = ({ report, key }: { report: IReportReturnPayload, key: number }):
                             <BigHead />
                         </div>
                         <div className="ml-2">
-                            <span className="text-700 text-lg font-medium p-0 m-0">{reportData.user.username || 'Anonymous'}</span>
+                            <span className="text-700 text-lg font-medium p-0 m-0">{reportData.user.username || t('anonimo')}</span>
                             <span className="text-500 text-sm font-medium p-0 m-0 ml-2">{reportData.time}</span>
                         </div>
                     </div>
@@ -91,7 +94,7 @@ const Report = ({ report, key }: { report: IReportReturnPayload, key: number }):
                         <div className="w-2rem border-circle h-2rem bg-primary flex align-items-center justify-content-center mr-2">
                             <i className="pi pi-bookmark"></i>
                         </div>
-                        <span className="text-700 text-lg font-medium p-0 m-0 mr-4">{reportData.category}</span>
+                        <span className="text-700 text-lg font-medium p-0 m-0 mr-4">{t(`categorys:${reportData.category}`)}</span>
                         <div className="w-2rem border-circle h-2rem bg-primary flex align-items-center justify-content-center mr-2">
                             <i className="pi pi-map"></i>
                         </div>

@@ -13,6 +13,7 @@ import SelectCity from './SelectCity';
 import SelectDistrict from './SelectDistrict';
 import { IErrorField, IResponseError } from '@/types/response';
 import SelectCategory from './SelectCategory';
+import { useTranslation } from 'next-i18next';
 
 export interface ReportEditorProps {
     onSave: () => void;
@@ -43,6 +44,7 @@ const ReportEditor = (props: ReportEditorProps): JSX.Element => {
 
     const fileUploadRef = useRef<FileUpload>(null);
     const { showDialog } = useAuthenticate();
+    const { t } = useTranslation(['feed', 'common']);
 
     const onTextChange = (e: any) => {
         setText(e.htmlValue);
@@ -75,75 +77,81 @@ const ReportEditor = (props: ReportEditorProps): JSX.Element => {
     const renderHeader = () => {
         return (
             <span className="ql-formats flex align-items-center">
-                <button className="ql-bold" aria-label="Bold"></button>
-                <button className="ql-italic" aria-label="Italic"></button>
-                <button className="ql-underline" aria-label="Underline"></button>
-                <button className="ql-link" aria-label="link"></button>
-                <FileUpload 
-                    ref={fileUploadRef}
-                    mode="basic"
-                    name="demo[]"
-                    accept="image/*" 
-                    maxFileSize={1000000} 
-                    customUpload 
-                    uploadHandler={customBase64Uploader}
-                    auto
-                    multiple
-                    chooseOptions={{
-                        icon: 'pi pi-image',
-                        iconOnly: true,
-                        className: 'p-button-text p-button-plain p-2 m-0'
-                    }}
-                />
-                <SelectCity
-                    id="city_id"
-                    name="city_id"
-                    placeholder="Select a city"
-                    value={city}
-                    onChange={(e) => {
-                        setCity(e.value);
-                        setDistrict('');
-                        setErrors(prevErrors => ({
-                            ...prevErrors,
-                            city_id: false,
-                            district_id: false,
-                        }));
-                    }}
-                    className={classNames({ 'p-invalid': Boolean(errors.city_id) })}
-                    error={errors.city_id}
-                />
-                <SelectDistrict
-                    id="district_id"
-                    name="district_id"
-                    placeholder="Select a district"
-                    city={city}
-                    value={district}
-                    onChange={(e) => {
-                        setDistrict(e.value);
-                        setErrors(prevErrors => ({
-                            ...prevErrors,
-                            district_id: false,
-                        }));
-                    }}
-                    className={classNames({ 'p-invalid': Boolean(errors.city_id), 'ml-2': true})}
-                    error={errors.district_id}
-                    disabled={isEmpty(city)}
-                />
-                <SelectCategory
-                    id="category_id"
-                    name="category_id"
-                    placeholder="Select a category"
-                    value={category}
-                    onChange={(e) => {
-                        setCategory(e.value);
-                        setErrors(prevErrors => ({
-                            ...prevErrors,
-                            category_id: false,
-                        }));
-                    }}
-                    className={classNames({ 'p-invalid': Boolean(errors.city_id), 'ml-2': true})}
-                    error={errors.category_id}
-                />
+                <div className="flex flex-wrap">
+                    <div className="flex align-items-center">
+                        <button className="ql-bold" aria-label="Bold"></button>
+                        <button className="ql-italic" aria-label="Italic"></button>
+                        <button className="ql-underline" aria-label="Underline"></button>
+                        <button className="ql-link" aria-label="link"></button>
+                        <FileUpload 
+                            ref={fileUploadRef}
+                            mode="basic"
+                            name="demo[]"
+                            accept="image/*" 
+                            maxFileSize={1000000} 
+                            customUpload 
+                            uploadHandler={customBase64Uploader}
+                            auto
+                            multiple
+                            chooseOptions={{
+                                icon: 'pi pi-image',
+                                iconOnly: true,
+                                className: 'p-button-text p-button-plain p-2 m-0'
+                            }}
+                        />
+                    </div>
+                    <div className="flex flex-wrap align-items-center gap-2 lg:gap-0">
+                        <SelectCity
+                            id="city_id"
+                            name="city_id"
+                            placeholder={t('feed:placeholders.select-city')}
+                            value={city}
+                            onChange={(e) => {
+                                setCity(e.value);
+                                setDistrict('');
+                                setErrors(prevErrors => ({
+                                    ...prevErrors,
+                                    city_id: false,
+                                    district_id: false,
+                                }));
+                            }}
+                            className={classNames({ 'p-invalid': Boolean(errors.city_id) })}
+                            error={errors.city_id}
+                        />
+                        <SelectDistrict
+                            id="district_id"
+                            name="district_id"
+                            placeholder={t('feed:placeholders.select-district')}
+                            city={city}
+                            value={district}
+                            onChange={(e) => {
+                                setDistrict(e.value);
+                                setErrors(prevErrors => ({
+                                    ...prevErrors,
+                                    district_id: false,
+                                }));
+                            }}
+                            className={classNames({ 'p-invalid': Boolean(errors.city_id), 'lg:ml-2': true})}
+                            error={errors.district_id}
+                            disabled={isEmpty(city)}
+                        />
+                        <SelectCategory
+                            id="category_id"
+                            name="category_id"
+                            placeholder={t('feed:placeholders.select-category')}
+                            value={category}
+                            onChange={(e) => {
+                                setCategory(e.value);
+                                setErrors(prevErrors => ({
+                                    ...prevErrors,
+                                    category_id: false,
+                                }));
+                            }}
+                            className={classNames({ 'p-invalid': Boolean(errors.city_id), 'lg:ml-2': true})}
+                            error={errors.category_id}
+                        />
+                    </div>
+                </div>
             </span>
         );
     }
@@ -215,8 +223,8 @@ const ReportEditor = (props: ReportEditorProps): JSX.Element => {
                     value={text}
                     onTextChange={onTextChange}
                     headerTemplate={header}
-                    className="placeholder-white border-none text-lg"
-                    placeholder="Report your problem here..."
+                    className="placeholder-white border-none text-lg w-full"
+                    placeholder={t('feed:placeholders.editor') || ''}
                 />
                 {(medias.length > 0) && (
                     <div className="flex flex-wrap">

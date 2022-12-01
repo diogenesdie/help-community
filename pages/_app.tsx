@@ -8,6 +8,7 @@ import type { AppProps } from 'next/app'
 import Head from 'next/head';
 import { version } from "../package.json";
 import { SWRConfig } from 'swr';
+import { appWithTranslation } from 'next-i18next';
 import ProvideAuthenticate from '@/hooks/authenticate-hook'
 
 const swrConfig = {
@@ -30,4 +31,4 @@ const HelpCommunityApp = ({ Component, pageProps }: AppProps) => {
 	);
 }
 
-export default HelpCommunityApp;
+export default appWithTranslation(HelpCommunityApp);

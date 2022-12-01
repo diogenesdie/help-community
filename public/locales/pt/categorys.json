@@ -1,0 +1,9 @@
+{
+    "TRAFFIC_LIGHTS": "Semáforos",
+    "ROADS": "Ruas",
+    "POTHOLES": "Buracos",
+    "GARBAGE": "Lixo",
+    "STREET_LIGHTS": "Lâmpadas",
+    "TREES": "Árvores",
+    "OTHER": "Outro"
+}

@@ -1,0 +1,22 @@
+{
+    "title": "Bem vindo",
+    "sem-conta": "Não possui uma conta?",
+    "criar-conta": "Criar uma conta",
+    "labels": {
+        "username": "Usuário",
+        "password": "Senha",
+        "login": "Entrar"
+    },
+    "placeholders": {
+        "username": "Digite seu usuário",
+        "password": "Digite sua senha"
+    },
+    "validation": {
+        "username": {
+            "required": "O usuário é obrigatório"
+        },
+        "password": {
+            "required": "A senha é obrigatória"
+        }
+    }
+}

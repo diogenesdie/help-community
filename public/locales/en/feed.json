@@ -1,0 +1,25 @@
+{
+    "messages":{
+        "hello": "Hello, {{name}}!",
+        "no-reports-found": "No reports found"
+    },
+    "title": "Reports",
+    "placeholders": {
+        "editor": "Report your problem here...",
+        "select-category": "Select a category",
+        "select-city": "Select a city",
+        "select-district": "Select a district",
+        "filter-category": "Filter by category",
+        "filter-city": "Filter by city",
+        "filter-district": "Filter by district"
+    },
+    "buttons": {
+        "clear-filters": "Clear filters"
+    },
+    "order": {
+        "LATEST": "Latest",
+        "OLDEST": "Oldest",
+        "MOST_VOTED": "Most voted",
+        "LEAST_VOTED": "Least voted"
+    }
+}

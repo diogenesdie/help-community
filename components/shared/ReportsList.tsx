@@ -11,6 +11,7 @@ import SelectCity from "./SelectCity";
 import SelectDistrict from "./SelectDistrict";
 import SelectCategory from "./SelectCategory";
 import { Button } from "primereact/button";
+import { useTranslation } from "next-i18next";
 
 export interface IReportsListRef {
     reload: () => void;
@@ -35,6 +36,7 @@ const ReportsList = forwardRef(function ReportsList(props, ref): JSX.Element {
         reloadReports,
     } = useReports(filters);
     const [showReload, setShowReload] = useState<boolean>(true);
+    const { t } = useTranslation(['common', 'feed']);
 
     useImperativeHandle(ref, () => ({   
         reload: () => {
@@ -65,7 +67,7 @@ const ReportsList = forwardRef(function ReportsList(props, ref): JSX.Element {
                 <SelectCity
                     id="city"
                     name="city"
-                    placeholder="Filter by city"
+                    placeholder={t('feed:placeholders.filter-city')}
                     className="p-mr-2"
                     classNameField="w-3"
                     value={filters.city}
@@ -75,7 +77,7 @@ const ReportsList = forwardRef(function ReportsList(props, ref): JSX.Element {
                 <SelectDistrict
                     id="district"
                     name="district"
-                    placeholder="Filter by district"
+                    placeholder={t('feed:placeholders.filter-district')}
                     className="p-mr-2"
                     classNameField="w-3"
                     value={filters.district}
@@ -87,7 +89,7 @@ const ReportsList = forwardRef(function ReportsList(props, ref): JSX.Element {
                 <SelectCategory
                     id="category"
                     name="category"
-                    placeholder="Filter by category"
+                    placeholder={t('feed:placeholders.filter-category')}
                     className="p-mr-2"
                     classNameField="w-3"
                     value={filters.category}
@@ -101,10 +103,10 @@ const ReportsList = forwardRef(function ReportsList(props, ref): JSX.Element {
                     className="p-mr-2 w-3"
                     value={`${filters.sortField}:${filters.sortOrder}`}
                     options={[
-                        {label: 'Latest', value: 'created_at:desc', type: 'desc'},
-                        {label: 'Oldest', value: 'created_at:asc', type: 'asc'},
-                        {label: 'Most liked', value: 'votes:desc', type: 'desc'},
-                        {label: 'Least liked', value: 'votes:asc', type: 'asc'},
+                        {label: t('feed:order.LATEST'), value: 'created_at:desc', type: 'desc'},
+                        {label: t('feed:order.OLDEST'), value: 'created_at:asc', type: 'asc'},
+                        {label: t('feed:order.MOST_VOTED'), value: 'votes:desc', type: 'desc'},
+                        {label: t('feed:order.LEAST_VOTED'), value: 'votes:asc', type: 'asc'},
                     ]}
                     onChange={(e) => setFilters(prevFilters => {
                         const { value } = e.target;
@@ -130,9 +132,9 @@ const ReportsList = forwardRef(function ReportsList(props, ref): JSX.Element {
                     <div className="flex justify-content-center align-items-center mt-7 w-full">
                         <span className="flex align-items-center justify-content-center bg-cyan-100 text-cyan-800 mr-3 border-circle mb-3" style={{width: '64px', height: '64px'}}><i className="pi pi-exclamation-circle text-5xl"></i></span>
                     </div>
-                    <h2 className="text-center mt-0 w-full">No reports found</h2>
+                    <h2 className="text-center mt-0 w-full">{t('feed:messages.no-reports-found')}</h2>
                     <Button
-                        label="Clear filters"
+                        label={t('feed:buttons.clear-filters') || ''}
                         className="p-button-primary w-2"
                         onClick={() => setFilters(prevFilters => ({
                             ...prevFilters,

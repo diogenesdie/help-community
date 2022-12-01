@@ -9,7 +9,10 @@ import { register } from '@/services/authenticate-service';
 import { useAuthenticate } from '@/hooks/authenticate-hook';
 import { ProgressBar } from 'primereact/progressbar';
 import { IResponseError } from '@/types/response';
-import Link from 'next/link';
+import type { GetStaticProps } from 'next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations'; 
+import { useTranslation } from 'next-i18next';
+import SelectLang from '@/components/shared/SelectLang';
 
 interface IRegisterState {
     username: string;
@@ -42,6 +45,8 @@ const RegisterPage = (): JSX.Element => {
     const router = useRouter();
     const [isRegister, setIsRegister] = useState<boolean>(false);
     const [isRegisterOk, setIsRegisterOk] = useState<boolean>(false);
+
+    const { t } = useTranslation(['common', 'register']);
 
     useEffect(() => {
         if( !session || sessionError ) {
@@ -89,35 +94,33 @@ const RegisterPage = (): JSX.Element => {
         if( !username ) {
             setErrors(prevErrors => ({
                 ...prevErrors,
-                username: 'Username is required'
+                username: t('register:validation.username.required') || ''
             }));
         }
 
         if( !password ) {
             setErrors(prevErrors => ({
                 ...prevErrors,
-                password: 'Password is required'
+                password: t('register:validation.password.required') || ''
             }));
         }
 
         if( !confirm_password ) {
             setErrors(prevErrors => ({
                 ...prevErrors,
-                confirm_password: 'Confirm password is required'
+                confirm_password: t('register:validation.confirm-password.required') || ''
             }));
         }
 
         if( password !== confirm_password ) {
             setErrors(prevErrors => ({
                 ...prevErrors,
-                confirm_password: 'Passwords do not match'
+                confirm_password: t('register:validation.confirm-password.not-equal') || ''
             }));
         }
 
         try {
             setIsRegister(true);
-            console.log('Registering...');
-            console.log(username, password, confirm_password);
             if( username && password && confirm_password) {
                 await register({
                     username,
@@ -137,7 +140,7 @@ const RegisterPage = (): JSX.Element => {
         setIsRegister(false);
     }
 
-    if( (session && session.id && !sessionError) || isLoadingSession ) {
+    if( (session && session.public_token && !sessionError) ) {
         return <div className="flex flex-wrap justify-content-center align-items-center" style={{ height: '100vh' }}>
                 <div className="flex flex-wrap justify-content-center w-full">
                     <Image src={logoPrimary} alt="Help Community" width={400} />
@@ -151,13 +154,16 @@ const RegisterPage = (): JSX.Element => {
     return (
         <div className="flex justify-content-center align-items-center w-full h-screen">
             <div className="surface-card p-4 shadow-2 border-round w-full lg:w-4">
+                <div className="flex w-full justify-content-end">
+                    <SelectLang />
+                </div>
                 <div className="text-center mb-5">
                     <Image src={logoPrimary} alt="Help Community Logo" width={250}  />
-                    <div className="text-900 text-3xl font-medium mb-3">Create your account</div>
+                    <div className="text-900 text-3xl font-medium mb-3">{t('register:title')}</div>
                 </div>
 
                 <div>
-                    <label htmlFor="username" className="block text-900 font-medium mb-2">Username</label>
+                    <label htmlFor="username" className="block text-900 font-medium mb-2">{t('register:labels.username')}</label>
                     <InputText 
                         id="username"
                         name="username"
@@ -166,13 +172,13 @@ const RegisterPage = (): JSX.Element => {
                             'p-invalid': Boolean(errors.username),
                             'w-full': true
                         })}
-                        placeholder="Username"
+                        placeholder={t('register:placeholders.username') || ''}
                         onChange={handleChange} 
                         maxLength={100}
                         value={state.username}
                     />
                     {errors.username && <small className="p-error">{errors.username}</small>}
-                    <label htmlFor="password" className="block text-900 font-medium mb-2 mt-3">Password</label>
+                    <label htmlFor="password" className="block text-900 font-medium mb-2 mt-3">{t('register:labels.password')}</label>
                     <InputText
                         id="password"
                         name="password"
@@ -182,12 +188,12 @@ const RegisterPage = (): JSX.Element => {
                             'p-invalid': Boolean(errors.password),
                             'w-full': true
                         })}
-                        placeholder="Password"
+                        placeholder={t('register:placeholders.password') || ''}
                         onChange={handleChange} 
                         maxLength={100}
                     />
                     {errors.password && <small className="p-error">{errors.password}</small>}
-                    <label htmlFor="confirm_password" className="block text-900 font-medium mb-2 mt-3">Confirm Password</label>
+                    <label htmlFor="confirm_password" className="block text-900 font-medium mb-2 mt-3">{t('register:labels.confirm-password')}</label>
                     <InputText
                         id="confirm_password"
                         name="confirm_password"
@@ -197,13 +203,13 @@ const RegisterPage = (): JSX.Element => {
                             'p-invalid': Boolean(errors.confirm_password),
                             'w-full': true
                         })}
-                        placeholder="Confirm Password"
+                        placeholder={t('register:placeholders.confirm-password') || ''}
                         onChange={handleChange}
                         maxLength={100}
                     />
                     {errors.confirm_password && <small className="p-error">{errors.confirm_password}</small>}
                     <Button 
-                        label="Register"
+                        label={t('register:labels.register') || ''}
                         icon="pi pi-user"
                         className="w-full mt-3"  
                         onClick={onSubmit}
@@ -216,5 +222,11 @@ const RegisterPage = (): JSX.Element => {
         
     )
 }
+
+export const getStaticProps: GetStaticProps = async ({ locale }) => ({
+    props: {
+        ...(await serverSideTranslations(locale ?? 'pt', ['common','register']))
+    }
+});
 
 export default RegisterPage

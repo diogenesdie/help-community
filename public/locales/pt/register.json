@@ -1,0 +1,26 @@
+{
+    "title": "Crie sua conta",
+    "labels": {
+        "username": "Usuário",
+        "password": "Senha",
+        "confirm-password": "Confirmar senha",
+        "register": "Registrar"
+    },
+    "placeholders": {
+        "username": "Digite seu usuário",
+        "password": "Digite sua senha",
+        "confirm-password": "Confirme sua senha"
+    },
+    "validation": {
+        "username": {
+            "required": "O usuário é obrigatório"
+        },
+        "password": {
+            "required": "A senha é obrigatória"
+        },
+        "confirm-password": {
+            "required": "A confirmação da senha é obrigatória",
+            "not-equal": "As senhas não são iguais"
+        }
+    }
+}

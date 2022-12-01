@@ -10,6 +10,10 @@ import { useAuthenticate } from '@/hooks/authenticate-hook';
 import { ProgressBar } from 'primereact/progressbar';
 import { IResponseError } from '@/types/response';
 import Link from 'next/link';
+import type { GetStaticProps } from 'next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations'; 
+import { useTranslation } from 'next-i18next';
+import SelectLang from "@/components/shared/SelectLang";
 
 interface ILoginState {
     username: string;
@@ -38,6 +42,8 @@ const LoginPage = (): JSX.Element => {
     const router = useRouter();
     const [isLogin, setIsLogin] = useState<boolean>(false);
     const [isLoginOk, setIsLoginOk] = useState<boolean>(false);
+
+    const { t } = useTranslation(['common', 'login']);
 
     useEffect(() => {
         if( !session || sessionError ) {
@@ -116,7 +122,7 @@ const LoginPage = (): JSX.Element => {
         setIsLogin(false);
     }
 
-    if( (session && session.id && !sessionError) || isLoadingSession ) {
+    if( (session && session.public_token && !sessionError) ) {
         return <div className="flex flex-wrap justify-content-center align-items-center" style={{ height: '100vh' }}>
                 <div className="flex flex-wrap justify-content-center w-full">
                     <Image src={logoPrimary} alt="Help Community" width={400} />
@@ -130,20 +136,23 @@ const LoginPage = (): JSX.Element => {
     return (
         <div className="flex justify-content-center align-items-center w-full h-screen">
             <div className="surface-card p-4 shadow-2 border-round w-full lg:w-4">
+                <div className="flex w-full justify-content-end">
+                    <SelectLang />
+                </div>
                 <div className="text-center mb-5">
                     <Image src={logoPrimary} alt="Help Community Logo" width={250}  />
-                    <div className="text-900 text-3xl font-medium mb-3">Welcome Back</div>
-                    <span className="text-600 font-medium line-height-3">Dont have an account?</span>
+                    <div className="text-900 text-3xl font-medium mb-3">{t('login:title')}</div>
+                    <span className="text-600 font-medium line-height-3">{t('login:sem-conta')}</span>
                     <Link 
                         className="font-medium no-underline ml-2 text-blue-500 cursor-pointer"
                         href="/register"
                     >
-                        Create today!
+                        {t('login:criar-conta')}
                     </Link>
                 </div>
 
                 <div>
-                    <label htmlFor="username" className="block text-900 font-medium mb-2">Username</label>
+                    <label htmlFor="username" className="block text-900 font-medium mb-2">{t('login:labels.username')}</label>
                     <InputText 
                         id="username"
                         name="username"
@@ -152,13 +161,13 @@ const LoginPage = (): JSX.Element => {
                             'p-invalid': Boolean(errors.username),
                             'w-full': true
                         })}
-                        placeholder="Username"
+                        placeholder={t('login:placeholders.username') || ''}
                         onChange={handleChange} 
                         maxLength={100}
                         value={state.username}
                     />
                     {errors.username && <small className="p-error">{errors.username}</small>}
-                    <label htmlFor="password" className="block text-900 font-medium mb-2 mt-3">Password</label>
+                    <label htmlFor="password" className="block text-900 font-medium mb-2 mt-3">{t('login:labels.password')}</label>
                     <InputText
                         id="password"
                         name="password"
@@ -168,7 +177,7 @@ const LoginPage = (): JSX.Element => {
                             'p-invalid': Boolean(errors.password),
                             'w-full': true
                         })}
-                        placeholder="Password"
+                        placeholder={t('login:placeholders.password') || ''}
                         onChange={handleChange} 
                         maxLength={100}
                     />
@@ -182,7 +191,7 @@ const LoginPage = (): JSX.Element => {
                     </div>
 
                     <Button 
-                        label="Sign In"
+                        label={t('login:labels.login') || ''}
                         icon="pi pi-user"
                         className="w-full"  
                         onClick={onSubmit}
@@ -195,5 +204,11 @@ const LoginPage = (): JSX.Element => {
         
     )
 }
+
+export const getStaticProps: GetStaticProps = async ({ locale }) => ({
+    props: {
+        ...(await serverSideTranslations(locale ?? 'pt', ['common','login']))
+    }
+});
 
 export default LoginPage

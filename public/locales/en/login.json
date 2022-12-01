@@ -1,0 +1,22 @@
+{
+    "title": "Welcome",
+    "sem-conta": "Don't have an account?",
+    "criar-conta": "Create an account",
+    "labels": {
+        "username": "Username",
+        "password": "Password",
+        "login": "Sign in"
+    },
+    "placeholders": {
+        "username": "Type your username",
+        "password": "Type your password"
+    },
+    "validation": {
+        "username": {
+            "required": "Username is required"
+        },
+        "password": {
+            "required": "Password is required"
+        }
+    }
+}
