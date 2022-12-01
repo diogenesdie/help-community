@@ -137,7 +137,7 @@ const RegisterPage = (): JSX.Element => {
         setIsRegister(false);
     }
 
-    if( (session && !sessionError) || isLoadingSession ) {
+    if( (session && session.id && !sessionError) || isLoadingSession ) {
         return <div className="flex flex-wrap justify-content-center align-items-center" style={{ height: '100vh' }}>
                 <div className="flex flex-wrap justify-content-center w-full">
                     <Image src={logoPrimary} alt="Help Community" width={400} />
