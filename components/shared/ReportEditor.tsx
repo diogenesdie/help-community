@@ -210,9 +210,9 @@ const ReportEditor = (props: ReportEditorProps): JSX.Element => {
         } catch (error: any) {
             dispatchError(error);
 
-            if( error.fields && error.fields.length > 0 ) {
+            if( !error.fields || !error.fields.length ) {
                 showDialog({
-                    title: 'Validation error',
+                    title: 'Opss...',
                     message: error.message,
                     button_text: 'Ok',
                     type: 'error'

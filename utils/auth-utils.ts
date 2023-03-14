@@ -32,14 +32,14 @@ export const setTokenCookie = (
         httpOnly: true,
         path: '/',
         sameSite: 'strict',
-        secure: process.env.NODE_ENV === 'production',
+        secure: false,
     });
     const publicToken = serialize(PUBLIC_TOKEN_NAME, public_token, {
         maxAge: maxAge,
         expires: expires_at,
         httpOnly: false,
         path: '/',
-        secure: process.env.NODE_ENV === 'production',
+        secure: false,
     });
 
     res.setHeader('Set-Cookie', [privateCookie, publicToken]);

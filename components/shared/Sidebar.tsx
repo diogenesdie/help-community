@@ -71,7 +71,7 @@ const Sidebar = (props: SidebarProps): JSX.Element => {
                         await logout();
                     } catch (error: any) {
                         showDialog({
-                            title: 'Error',
+                            title: 'Opss...',
                             message: error.message,
                             button_text: 'Ok',
                             type: 'error'

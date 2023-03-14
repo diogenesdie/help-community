@@ -31,7 +31,7 @@ const Report = ({ report, key }: { report: IReportReturnPayload, key: number }):
 
         } catch (error: any) {
             showDialog({
-                title: 'Error',
+                title: 'Opss...',
                 message: error.message,
                 button_text: 'Ok',
                 type: 'error'
